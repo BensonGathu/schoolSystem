@@ -55,7 +55,6 @@ class Staffs(models.Model):
     staff_ID = models.TextField()
     gender = models.CharField(choices=genders,max_length=100)
     profile_pic = models.FileField()
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -112,7 +111,7 @@ class_list =(
 class Classes(models.Model):
     id =models.AutoField(primary_key=True)
     name = models.CharField(choices=class_list,max_length=1000)
-    session = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING)
+    sessionperiod = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING)
     class_teacher = models.ForeignKey(CustomUser,on_delete=models.DO_NOTHING, null = True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -123,6 +122,7 @@ class Subjects(models.Model):
     subject_name = models.CharField(choices=subject_names,max_length=255)
      
     # need to give default course
+    class_id = models.ForeignKey(Classes,on_delete=models.DO_NOTHING,null=True)
     session_id = models.ForeignKey(SessionYearModel, on_delete=models.DO_NOTHING, null = True)
     staff_id = models.ForeignKey(CustomUser,on_delete=models.DO_NOTHING, null = True)
     created_at = models.DateTimeField(auto_now_add=True)
