@@ -6,9 +6,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .forms import AddStudentForm, EditStudentForm,addClassForm,editClassForm,addSessionYearModelForm,editSessionYearModelForm,addSubjectForm,editSubjectForm,addLeaveReportStaff,addFeedBackStaffs,addNotificationStaffs,addStaffForm,editStaffForm
+from .forms import AddStudentForm, EditStudentForm,addClassForm,editClassForm,addSessionYearModelForm,editSessionYearModelForm,addSubjectForm,editSubjectForm,addLeaveReportStaff,addFeedBackStaffs,addNotificationStaffs,addStaffForm,editStaffForm,adminUpdateProfileForm
 
-from .models import CustomUser, SessionYearModel, StudentResult, users_type, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
+from .models import CustomUser, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff,Admin
 
 	#managing session periods
 def manage_session(request):
@@ -54,7 +54,7 @@ def edit_session(request, session_id):
 	# Adding Student ID into Session Variable
 	request.session['session_id'] = session_id
 
-	form = editSessionYearModelForm()
+	form = editSessionYearModelForm() 
 	form.fields["session_start_year"].initial = session_year.session_start_year
 	form.fields["session_end_year"].initial = session_year.session_end_year
 
@@ -106,7 +106,7 @@ def delete_session(request, session_id):
 		return redirect('manage_session')
 
 
-def users_type_home(request):
+def admin_home(request):
 	
 	all_student_count = Students.objects.all().count()
 	subject_count = Subjects.objects.all().count()
@@ -971,7 +971,7 @@ def student_feedback_message(request):
 	return render(request, 'admin_templates/student_feedback_template.html', context)
 
 
-@csrf_exemptusers_type
+@csrf_exempt
 def student_feedback_message_reply(request):
 	feedback_id = request.POST.get('id')
 	feedback_reply = request.POST.get('reply')
@@ -1110,36 +1110,57 @@ def users_type_get_attendance_student(request):
 	return JsonResponse(json.dumps(list_data), content_type="application/json", safe=False)
 
 
-def users_type_profile(request):
+def admin_profile(request):
 	user = CustomUser.objects.get(id=request.user.id)
+	form = adminUpdateProfileForm()
+	form.fields["username"].initial = user.users_type.username
+	form.fields["first_name"].initial = user.users_type.first_name
+	form.fields["last_name"].initial = user.users_type.last_name
+	form.fields["password"].initial = user.users_type.password
+	form.fields["email"].initial = user.users_type.email
+	form.fields["profile_pic"].initial = user.users_type.profile_pic
 
 	context={
-		"user": user
+		"user": user,
+		"form":form
 	}
-	return render(request, 'admin_templates/users_type_profile.html', context)
+	return render(request, 'admin_templates/admin_profile.html', context)
 
 
-def users_type_profile_update(request):
+def admin_profile_update(request):
 	if request.method != "POST":
 		messages.error(request, "Invalid Method!")
-		return redirect('users_type_profile')
+		return redirect('admin_profile')
 	else:
-		first_name = request.POST.get('first_name')
-		last_name = request.POST.get('last_name')
-		password = request.POST.get('password')
+		form = adminUpdateProfileForm(request.POST, request.FILES)
+		if form.is_valid():
+			first_name = form.cleaned_data['first_name']
+			last_name = form.cleaned_data['last_name']
+			username = form.cleaned_data['username']
+			email = form.cleaned_data['email']
+			password = form.cleaned_data['password']
+			address = form.cleaned_data['address']
+			profile_pic = form.cleaned_data['profile_pic']
 
 		try:
 			customuser = CustomUser.objects.get(id=request.user.id)
+			customuser.username = username
 			customuser.first_name = first_name
 			customuser.last_name = last_name
+			customuser.email = email
+
 			if password != None and password != "":
 				customuser.set_password(password)
+
+			admin = Admin.objects.get(users_type=customuser.id)
+			admin.address = address
+			admin.profile_pic = profile_pic
 			customuser.save()
 			messages.success(request, "Profile Updated Successfully")
-			return redirect('users_type_profile')
+			return redirect('admin_profile')
 		except:
 			messages.error(request, "Failed to Update Profile")
-			return redirect('users_type_profile')
+			return redirect('admin_profile')
 	
 
 

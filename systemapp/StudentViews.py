@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 import datetime
+from .forms import studentUpdateProfileForm 
 from .models import CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
 def student_home(request):
     student_obj = Students.objects.get(users_type=request.user.id)
@@ -163,10 +164,19 @@ def student_feedback_save(request):
 def student_profile(request):
 	user = CustomUser.objects.get(id=request.user.id)
 	student = Students.objects.get(users_type=user)
+	
+	form = studentUpdateProfileForm()
+	form.fields["username"].initial = user.users_type.username
+	form.fields["first_name"].initial = user.users_type.first_name
+	form.fields["last_name"].initial = user.users_type.last_name
+	form.fields["password"].initial = user.users_type.password
+	form.fields["email"].initial = user.users_type.email
+	form.fields["profile_pic"].initial = user.users_type.profile_pic
 
 	context={
 		"user": user,
-		"student": student
+		"student": student,
+		"form":form
 	}
 	return render(request, 'student_template/student_profile.html', context)
 
@@ -176,21 +186,30 @@ def student_profile_update(request):
 		messages.error(request, "Invalid Method!")
 		return redirect('student_profile')
 	else:
-		first_name = request.POST.get('first_name')
-		last_name = request.POST.get('last_name')
-		password = request.POST.get('password')
-		address = request.POST.get('address')
+		form = studentUpdateProfileForm(request.POST, request.FILES)
+		if form.is_valid():
 
+			first_name = form.cleaned_data['first_name']
+			last_name = form.cleaned_data['last_name']
+			username = form.cleaned_data['username']
+			email = form.cleaned_data['email']
+			password = form.cleaned_data['password']
+			address = form.cleaned_data['address']
+			profile_pic = form.cleaned_data['profile_pic']
 		try:
 			customuser = CustomUser.objects.get(id=request.user.id)
+			customuser.username = username
 			customuser.first_name = first_name
 			customuser.last_name = last_name
+			customuser.email = email
+		
 			if password != None and password != "":
 				customuser.set_password(password)
-			customuser.save()
+			customuser.save() 
 
 			student = Students.objects.get(users_type=customuser.id)
 			student.address = address
+			student.profile_pic = profile_pic
 			student.save()
 			
 			messages.success(request, "Profile Updated Successfully")

@@ -6,9 +6,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 import json
+from .forms import staffApplyLeaveForm,staffUpdateProfileForm
 
-
-from .models import CustomUser, SessionYearModel, StudentResult, users_type, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
+from .models import CustomUser, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
 
 
 def staff_home(request):
@@ -110,13 +110,17 @@ def staff_apply_leave_save(request):
 		messages.error(request, "Invalid Method")
 		return redirect('staff_apply_leave')
 	else:
-		leave_date = request.POST.get('leave_date')
-		leave_message = request.POST.get('leave_message')
+		form = staffApplyLeaveForm(request.POST, request.FILES)
+		if form.is_valid():
+			start_leave_date = form.cleaned_data['start_leave_date']
+			end_leave_date = form.cleaned_data['end_leave_date']
+			leave_message = form.cleaned_data['leave_message']
 
-		staff_obj = Staffs.objects.get(users_type=request.user.id)
+			staff_obj = Staffs.objects.get(users_type=request.user.id)
 		try:
 			leave_report = LeaveReportStaff(staff_id=staff_obj,
-											leave_date=leave_date,
+											start_leave_date=start_leave_date,
+											end_leave_date=end_leave_date,
 											leave_message=leave_message,
 											leave_status=0)
 			leave_report.save()
@@ -164,7 +168,7 @@ def get_students(request):
 
 	session_model = SessionYearModel.objects.get(id=session_year)
 
-	students = Students.objects.filter(subject_id=subject_model.course_id,
+	students = Students.objects.filter(subject_id=subject_model.class_id,
 									session_year_id=session_model)
 
 	# Only Passing Student Id and Student Name Only
@@ -304,34 +308,53 @@ def get_students(request):
 def staff_profile(request):
 	user = CustomUser.objects.get(id=request.user.id)
 	staff = Staffs.objects.get(users_type=user)
-
+	form = staffUpdateProfileForm()
+	form.fields["username"].initial = user.users_type.username
+	form.fields["first_name"].initial = user.users_type.first_name
+	form.fields["last_name"].initial = user.users_type.last_name
+	form.fields["password"].initial = user.users_type.password
+	form.fields["email"].initial = user.users_type.email
+	form.fields["profile_pic"].initial = user.users_type.profile_pic
 	context={
 		"user": user,
-		"staff": staff
+		"staff": staff,
+		"form":form
 	}
 	return render(request, 'staff_template/staff_profile.html', context)
-
+ 
 
 def staff_profile_update(request):
 	if request.method != "POST":
 		messages.error(request, "Invalid Method!")
 		return redirect('staff_profile')
 	else:
-		first_name = request.POST.get('first_name')
-		last_name = request.POST.get('last_name')
-		password = request.POST.get('password')
-		address = request.POST.get('address')
+		form = staffUpdateProfileForm(request.POST, request.FILES)
+		if form.is_valid():
+
+			first_name = form.cleaned_data['first_name']
+			last_name = form.cleaned_data['last_name']
+			username = form.cleaned_data['username']
+			email = form.cleaned_data['email']
+			password = form.cleaned_data['password']
+			address = form.cleaned_data['address']
+			profile_pic = form.cleaned_data['profile_pic']
 
 		try:
 			customuser = CustomUser.objects.get(id=request.user.id)
+
+			customuser.username = username
 			customuser.first_name = first_name
 			customuser.last_name = last_name
+			customuser.email = email
+		
+
 			if password != None and password != "":
 				customuser.set_password(password)
 			customuser.save()
 
 			staff = Staffs.objects.get(users_type=customuser.id)
 			staff.address = address
+			staff.profile_pic = profile_pic
 			staff.save()
 
 			messages.success(request, "Profile Updated Successfully")

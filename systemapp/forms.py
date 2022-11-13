@@ -1,7 +1,7 @@
 from django import forms
-from .models import Courses, CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+from .models import  CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
 
-
+#AdminView Forms
 class DateInput(forms.DateInput):
     input_type = "date"
 
@@ -34,7 +34,7 @@ class addStaffForm(forms.Form):
                               widget=forms.TextInput(attrs={"class": "form-control"}))
 
     national_ID = forms.IntegerField(label="national_ID",
-                              max_length=50,
+                              
                               widget=forms.TextInput(attrs={"class": "form-control"}))
 
     staff_ID = forms.CharField(label="staff_ID",
@@ -88,8 +88,8 @@ class editStaffForm(forms.Form):
                               widget=forms.TextInput(attrs={"class": "form-control"}))
 
     national_ID = forms.IntegerField(label="national_ID",
-                              max_length=50,
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
 
     staff_ID = forms.CharField(label="staff_ID",
                               max_length=50,
@@ -490,6 +490,35 @@ class editSubjectForm(forms.Form):
 ,
                                    widget=forms.Select(attrs={"class": "form-control"}))
 
+
+
+class adminUpdateProfileForm(forms.Form):
+    first_name = forms.CharField(label="First Name",
+                                 max_length=50,
+                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    last_name = forms.CharField(label="Last Name",
+                                max_length=50,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
+                        
+    username = forms.CharField(label="Username",
+                               max_length=50,
+                               widget=forms.TextInput(attrs={"class": "form-control"}))
+
+
+    password = forms.CharField(label="Password",
+                               max_length=50,
+                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
+
+    email = forms.EmailField(label="Email",
+                             max_length=50,
+                             widget=forms.EmailInput(attrs={"class": "form-control"}))
+
+    profile_pic = forms.FileField(label="Profile Pic",
+                                  required=False,
+                                  widget=forms.FileInput(attrs={"class": "form-control"}))
+
+
 class addLeaveReportStaff(forms.Form):
     pass
 
@@ -498,6 +527,76 @@ class addFeedBackStaffs(forms.Form):
 
 class addNotificationStaffs(forms.Form):
     pass
+ 
+
+
+#StaffView Forms
+class staffUpdateProfileForm(forms.Form):
+    first_name = forms.CharField(label="First Name",
+                                 max_length=50,
+                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    last_name = forms.CharField(label="Last Name",
+                                max_length=50,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
+                        
+    username = forms.CharField(label="Username",
+                               max_length=50,
+                               widget=forms.TextInput(attrs={"class": "form-control"}))
+
+
+    password = forms.CharField(label="Password",
+                               max_length=50,
+                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
+
+    email = forms.EmailField(label="Email",
+                             max_length=50,
+                             widget=forms.EmailInput(attrs={"class": "form-control"}))
+
+    profile_pic = forms.FileField(label="Profile Pic",
+                                  required=False,
+                                  widget=forms.FileInput(attrs={"class": "form-control"}))
+
+
+class staffApplyLeaveForm(forms.Form):
+    start_leave_date = forms.DateField(label="start_leave_date",widget=forms.SelectDateWidget())
+    end_leave_date = forms.DateField(label="end_leave_date",widget=forms.SelectDateWidget())
+    leave_message = forms.CharField(label="leave_message",
+                               max_length=500,
+                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
+
+
+
+#studentView Forms
+class studentUpdateProfileForm(forms.Form):
+    first_name = forms.CharField(label="First Name",
+                                 max_length=50,
+                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    last_name = forms.CharField(label="Last Name",
+                                max_length=50,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
+                        
+    username = forms.CharField(label="Username",
+                               max_length=50,
+                               widget=forms.TextInput(attrs={"class": "form-control"}))
+
+
+    password = forms.CharField(label="Password",
+                               max_length=50,
+                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
+
+    email = forms.EmailField(label="Email",
+                             max_length=50,
+                             widget=forms.EmailInput(attrs={"class": "form-control"}))
+
+    profile_pic = forms.FileField(label="Profile Pic",
+                                  required=False,
+                                  widget=forms.FileInput(attrs={"class": "form-control"}))
+
+
+
+
 
 
 
