@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 import datetime
+from django.contrib import messages
 from .forms import studentUpdateProfileForm 
 from .models import CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
 def student_home(request):
@@ -13,7 +14,7 @@ def student_home(request):
     #                                                     status=True).count()
     # attendance_absent = AttendanceReport.objects.filter(student_id=student_obj,
     #                                                     status=False).count()
-    class_obj = Classes.objects.get(id=student_obj.course_id.id)
+    class_obj = Classes.objects.get(id=student_obj.student_class.id)
     # total_subjects = Subjects.objects.filter(course_id=class_obj).count()
     subject_name = []
     data_present = []
@@ -40,7 +41,7 @@ def student_home(request):
             "data_present": data_present,
             "data_absent": data_absent
         }
-        return render(request, "student_template/student_home_template.html")
+        return render(request, "student-dashboard.html")
 
 
 def student_view_attendance(request):

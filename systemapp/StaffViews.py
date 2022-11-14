@@ -5,6 +5,7 @@ from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
+from django.contrib import messages
 import json
 from .forms import staffApplyLeaveForm,staffUpdateProfileForm
 
@@ -81,7 +82,7 @@ def staff_home(request):
 		# "attendance_present_list": student_list_attendance_present,
 		# "attendance_absent_list": student_list_attendance_absent
 	}
-    return render(request, "staff_template/staff_home_template.html", context)
+    return render(request, "teacher-dashboard.html", context)
 
 
 

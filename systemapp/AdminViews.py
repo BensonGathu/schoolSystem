@@ -183,7 +183,7 @@ def admin_home(request):
 		# "student_attendance_leave_list": student_attendance_leave_list,
 		"student_name_list": student_name_list,
 	}
-	return render(request, "admin_templates/home_content.html", context)
+	return render(request, "admin-dashboard.html", context)
 
 
 def add_staff(request):

@@ -6,14 +6,28 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 # Create your models here.
+
+terms = (
+    ("First Term", "First Term"),
+    ("Second Term","Second Term"),
+    ("Third Term","Third Term"),
+
+    ) 
+
 class SessionYearModel(models.Model):
     id = models.AutoField(primary_key=True)
+    school_term = models.CharField(choices=terms,max_length=100)
     session_start_year = models.DateField()
     session_end_year = models.DateField()
     objects = models.Manager()
 
 
+    def __str__(self):
+        return '{}  {} to {} '.format(self.school_term, self.session_start_year , self.session_end_year) 
 
+
+    class Meta:
+        unique_together=("school_term", "session_start_year", "session_end_year")
 
 
 class CustomUser(AbstractUser):
@@ -31,7 +45,8 @@ class CustomUser(AbstractUser):
  
     user_type_data = ((ADMIN, "ADMIN"),(TEACHER, "TEACHER"), (STAFF, "Staff"), (STUDENT, "Student"))
     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
- 
+
+
 genders = (
     ("Male", "Male"),
     ("Female","Female"),
@@ -40,8 +55,8 @@ genders = (
 class Admin(models.Model):
     id = models.AutoField(primary_key=True)
     users_type = models.OneToOneField(CustomUser, on_delete=models.DO_NOTHING, null = True)
-    national_ID = models.IntegerField()
-    staff_ID = models.TextField()
+    national_ID = models.IntegerField(blank=True,null=True)
+    staff_ID = models.TextField(blank=True,null=True)
     gender = models.CharField(choices=genders,max_length=100)
     profile_pic = models.FileField()
     address = models.TextField()
@@ -49,17 +64,23 @@ class Admin(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
+    def __str__(self):
+        return self.users_type.username
+
 class Staffs(models.Model):
     id = models.AutoField(primary_key=True)
     users_type = models.OneToOneField(CustomUser, on_delete=models.DO_NOTHING, null = True)
     address = models.TextField()
-    national_ID = models.IntegerField()
-    staff_ID = models.TextField()
+    national_ID = models.IntegerField(blank=True,null=True)
+    staff_ID = models.TextField(blank=True,null=True)
     gender = models.CharField(choices=genders,max_length=100)
     profile_pic = models.FileField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    def __str__(self):
+        return self.users_type.username
 
 class LeaveReportStaff(models.Model):
     id = models.AutoField(primary_key=True)
@@ -114,11 +135,14 @@ class_list =(
 class Classes(models.Model):
     id =models.AutoField(primary_key=True)
     name = models.CharField(choices=class_list,max_length=1000)
-    sessionperiod = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING)
+    sessionperiod = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING,null = True)
     class_teacher = models.ForeignKey(CustomUser,on_delete=models.DO_NOTHING, null = True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    def __str__(self):
+        return '{} {}'.format(self.name, self.sessionperiod)
 
 
     class Meta:
@@ -137,21 +161,27 @@ class Subjects(models.Model):
     objects = models.Manager()
 
 
+    def __str__(self):
+        return "{} {}".format(self.subject_name,self.class_id)
+
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
     users_type = models.OneToOneField(CustomUser,on_delete=models.DO_NOTHING, default=1)
-    gender = models.CharField(max_length=50)
+    gender = models.CharField(choices=genders,max_length=50)
     profile_pic = models.FileField()
     address = models.TextField()
     student_id = models.CharField(max_length=150)
     student_class = models.ForeignKey(Classes,on_delete=models.DO_NOTHING,null=True)
-    subject_id = models.ForeignKey(Subjects, on_delete=models.DO_NOTHING, null=True)
+    subject_id = models.ManyToManyField(Subjects)
     session_year_id = models.ForeignKey(SessionYearModel, null=True,
                                         on_delete=models.DO_NOTHING)
     kcpe_marks = models.IntegerField(default=0,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
+
+    def __str__(self):
+        return "{} {} ID = {}".format(self.users_type.first_name,self.users_type.last_name,self.student_id)
 
 
 
@@ -214,9 +244,9 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.user_type == 1:
             Admin.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
         if instance.user_type == 2:
-            Staffs.objects.create(users_type=instance,national_ID="",address="",staff_ID="",gender="",profile_pic="")
+            Staffs.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
         if instance.user_type == 3:
-            Staffs.objects.create(users_type=instance,national_ID="",address="",staff_ID="",gender="",profile_pic="")
+            Staffs.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
         if instance.user_type == 4:
             Students.objects.create(users_type=instance,
                                     subject_id="",
@@ -231,7 +261,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
     if instance.user_type == 1:
-        instance.adminhod.save()
+        instance.admin.save()
     if instance.user_type == 2:
         instance.staffs.save()
     if instance.user_type == 3:

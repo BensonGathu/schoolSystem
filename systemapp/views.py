@@ -1,141 +1,141 @@
-from django.shortcuts import render,HttpResponse, redirect,HttpResponseRedirect
+from django.shortcuts import render, HttpResponse, redirect, HttpResponseRedirect
 from django.contrib.auth import logout, authenticate, login
 from .models import CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
 from django.contrib import messages
-
+from .forms import CreateUserForm
+from django.contrib import messages
 # Create your views here.
 
 
-
 def home(request):
-	return render(request, 'home.html')
+    return render(request, 'admin-dashboard.html')
 
 
 def contact(request):
-	return render(request, 'contact.html')
+    return render(request, 'contact.html')
 
 
 def loginUser(request):
-	return render(request, 'login_page.html')
+    return render(request, 'auth/login_page.html')
 
-def doLogin(request):
+
+def loginpage(request):
+    if request.method == 'POST':
+        # email_id = request.POST.get('email')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+		
+        print(username)
+        print(password)
+        print(user)
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Logged in as' + ' ' + username)
+            print("logged")
+            if user.user_type == CustomUser.STUDENT:
+                return redirect('school:student_home')
+            elif user.user_type == CustomUser.STAFF:
+                return redirect('school:staff_home')
+            elif user.user_type == CustomUser.TEACHER:
+                return redirect('school:staff_home')
+           
+            elif user.user_type == CustomUser.ADMIN:
+                return redirect("school:admin_home")
+        else:
+            messages.error(request, 'Invalid Username and/or Password')
+    print("NOt valid")
+    context = {}
+    return render(request, 'auth/login_page.html')
+
+
 	
-	print("here")
-	email_id = request.GET.get('email')
-	password = request.GET.get('password')
-	# user_type = request.GET.get('user_type')
-	print(email_id)
-	print(password)
-	print(request.user)
-	if not (email_id and password):
-		messages.error(request, "Please provide all the details!!")
-		return render(request, 'login_page.html')
 
-	user = CustomUser.objects.filter(email=email_id, password=password).last()
-	if not user:
-		messages.error(request, 'Invalid Login Credentials!!')
-		return render(request, 'login_page.html')
-
-	login(request, user)
-	print(request.user)
-
-	if user.user_type == CustomUser.STUDENT:
-		return redirect('student_home/')
+def logoutUser(request):
+    current_user = request.user
+    logout(request)
+    messages.info(
+        request, 'You have logged out.')  
+    # if current_user.is_admin:
+    return redirect('school:home')
     
-	elif user.user_type == CustomUser.STAFF: 
-		return redirect('staff_home/')
 
-	elif user.user_type == CustomUser.TEACHER:
-		return redirect('teacher_home.html')
-	
-	elif user.user_type == CustomUser.ADMIN:
-		return redirect('admin__home/')
 
-	return render(request, 'home.html')
 
-	
 def registration(request):
-	return render(request, 'registration.html')
-	
+    form = CreateUserForm()
+    context = {
+            "form": form
+    }
+    return render(request, 'auth/registration.html', context)
+
 
 def doRegistration(request):
-	first_name = request.GET.get('first_name')
-	last_name = request.GET.get('last_name')
-	email_id = request.GET.get('email')
-	password = request.GET.get('password')
-	confirm_password = request.GET.get('confirmPassword')
+    form = CreateUserForm()
+    if request.method == "POST":
+        form = CreateUserForm(request.POST, request.FILES)
+        if form.is_valid():
+            
+            first_name = form.cleaned_data['firstname']
+            last_name = form.cleaned_data.get('lastname')
+            email_id = form.cleaned_data.get('email')
+            
+            # password = form.cleaned_data.get('password1')
+            # confirm_password = form.cleaned_data.get('password2')
 
-	print(email_id)
-	print(password)
-	print(confirm_password)
-	print(first_name)
-	print(last_name)
-	if not (email_id and password and confirm_password):
-		messages.error(request, 'Please provide all the details!!')
-		return render(request, 'registration.html')
-	
-	if password != confirm_password:
-		messages.error(request, 'Both passwords should match!!')
-		return render(request, 'registration.html')
 
-	is_user_exists = CustomUser.objects.filter(email=email_id).exists()
+        user_type = get_user_type_from_email(email_id)
+        print(user_type)
 
-	if is_user_exists:
-		messages.error(request, 'User with this email id already exists. Please proceed to login!!')
-		return render(request, 'registration.html')
+        if user_type is None:
+            messages.error(request, "Please use valid format for the email id: '<username>.<staff|student|hod>@<college_domain>'")
+            # return render(request, 'auth/registration.html',context)
 
-	user_type = get_user_type_from_email(email_id)
+        username = email_id.split('@')[0].split('.')[0]
+        print(username)
 
-	if user_type is None:
-		messages.error(request, "Please use valid format for the email id: '<username>.<staff|student|hod>@<college_domain>'")
-		return render(request, 'registration.html')
+        user = CustomUser()
+        user.username = username
+        user.email = email_id
+        # user.password = password
+        user.user_type = user_type
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        
 
-	username = email_id.split('@')[0].split('.')[0]
+        if user_type == CustomUser.STAFF:
+            Staffs.objects.create(users_type=user)
+        elif user_type == CustomUser.STUDENT:
+            Students.objects.create(users_type=user)
+        elif user_type == CustomUser.ADMIN:
+            Admin.objects.create(users_type=user)
+        elif user_type == CustomUser.TEACHER:
+            Staffs.objects.create(users_type=user)
+        return redirect("school:doLogin")
 
-	if CustomUser.objects.filter(username=username).exists():
-		messages.error(request, 'User with this username already exists. Please use different username')
-		return render(request, 'registration.html')
+    context = {
+                            "form": form
+        }
+    return render(request, 'auth/registration.html', context)
 
-	user = CustomUser()
-	user.username = username
-	user.email = email_id
-	user.password = password
-	user.user_type = user_type
-	user.first_name = first_name
-	user.last_name = last_name
-	user.save()
-	
-	if user_type == CustomUser.STAFF:
-		Staffs.objects.create(users_type=user)
-	elif user_type == CustomUser.STUDENT:
-		Students.objects.create(users_type=user)
-	elif user_type == CustomUser.ADMIN:
-		Admin.objects.create(users_type=user)
-	elif user_type == CustomUser.TEACHER:
-		Staffs.objects.create(users_type=user)
-	return render(request, 'login_page.html')
 
-	
 def logout_user(request):
-	logout(request)
-	return HttpResponseRedirect('/')
+    logout(request)
+    return HttpResponseRedirect('/')
 
 
 def get_user_type_from_email(email_id):
-	"""
-	Returns CustomUser.user_type corresponding to the given email address
-	email_id should be in following format:
-	'<username>.<staff|student|hod>@<college_domain>'
-	eg.: 'abhishek.staff@jecrc.com'
-	"""
+    """
+    Returns CustomUser.user_type corresponding to the given email address
+    email_id should be in following format:
+    '<username>.<staff|student|hod>@<college_domain>'
+    eg.: 'abhishek.staff@jecrc.com'
+    """
 
-	try:
-		email_id = email_id.split('@')[0]
-		email_user_type = email_id.split('.')[1]
-		return CustomUser.EMAIL_TO_USER_TYPE_MAP[email_user_type]
-	except:
-		return None
-
-
-
-
+    try:
+        email_id = email_id.split('@')[0]
+        email_user_type = email_id.split('.')[1]
+        return CustomUser.EMAIL_TO_USER_TYPE_MAP[email_user_type]
+    except:
+        return None

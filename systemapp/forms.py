@@ -1,5 +1,18 @@
 from django import forms
 from .models import  CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+from django.contrib.auth.forms import UserCreationForm
+
+
+class CreateUserForm(UserCreationForm):
+    firstname = forms.CharField(widget=forms.TextInput(attrs={"class":'form-control my-2', 'placeholder':'Enter firstname','type':'text'}))
+    lastname = forms.CharField(widget=forms.TextInput(attrs={"class":'form-control my-2', 'placeholder':'Enter lastname','type':'text'}))
+    email = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Enter email','type':'email'}))
+    password1 = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Enter password','type':'password'}))
+    password2 = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Confirm password','type':'password'}))
+    class Meta:
+        model = CustomUser
+        fields = ['firstname','lastname','email','password1','password2']
+
 
 #AdminView Forms
 class DateInput(forms.DateInput):
