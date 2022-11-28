@@ -8,7 +8,7 @@ from django.contrib import messages
 
 
 def home(request):
-    return render(request, 'admin-dashboard.html')
+    return render(request, 'home.html')
 
 
 def contact(request):

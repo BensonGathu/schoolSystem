@@ -1,0 +1,103 @@
+{% extends '../base.html' %}
+{% load admin_template_tags %}
+{% load static %}
+
+{% block content %}
+
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+
+      <div class="page-wrapper">
+        <div class="content container-fluid">
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h3 class="page-title">Classes</h3>
+                <ul class="breadcrumb">
+                  <li class="breadcrumb-item">
+                    Previous Classes
+                  </li>
+                  <li class="breadcrumb-item active"> <a href="{% url 'school:manage_classes' %}">Current Classes</a> </li>
+                </ul>
+              </div>
+              <div class="col-auto text-right float-right ml-auto">
+                <a href="#" class="btn btn-outline-primary mr-2"
+                  ><i class="fas fa-download"></i> Download</a
+                >
+                <a href="{% url 'school:add_class' %}" class="btn btn-primary"
+                  ><i class="fas fa-plus"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="card card-table">
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table
+                      class="table table-hover table-center mb-0 datatable"
+                    >
+                      <thead>
+                        <tr>
+                          <!-- <th>ID</th> -->
+                          <th>Name</th>
+                          <th>Class Teacher</th>
+                          <th> Year/Session</th>
+                          <th>No of Students</th>
+                          <th class="text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for class in classes %}
+                        <tr>
+                          <!-- <td>PRE2153</td> -->
+                          <td>
+                            <h2>
+                              <a>{{class.name}}</a>
+                            </h2>
+                          </td>
+                          <td>{{class.class_teacher}}</td>
+                          <td>{{class.sessionperiod}}</td>
+                          <td> {% student_class_count class %}</td>
+                          <td class="text-right">
+                            <div class="actions">
+                              <!-- <a
+                                href="edit-department.html"
+                                class="btn btn-sm bg-success-light mr-2"
+                              >
+                                <i class="fas fa-pen"></i>
+                              </a> -->
+                              <!-- <a href="#" class="btn btn-sm bg-danger-light">
+                                <i class="fas fa-trash"></i>
+                              </a> -->
+
+                              <a href="#" class="btn btn-lg ">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                        
+                      </tbody>
+                      {% endfor %}
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer>
+          <p>Copyright © 2020 Dreamguys.</p>
+        </footer>
+      </div>
+    </div>
+</body>
+
+
+   
+{% endblock %}

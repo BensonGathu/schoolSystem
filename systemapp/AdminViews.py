@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -6,93 +6,104 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .forms import AddStudentForm, EditStudentForm,addClassForm,editClassForm,addSessionYearModelForm,editSessionYearModelForm,addSubjectForm,editSubjectForm,addLeaveReportStaff,addFeedBackStaffs,addNotificationStaffs,addStaffForm,editStaffForm,adminUpdateProfileForm
+from .forms import AddStudentForm, CreateUserForm, EditStudentForm,addClassForm,editClassForm,addSessionYearModelForm,editSessionYearModelForm,addSubjectForm,editSubjectForm,addLeaveReportStaff,addFeedBackStaffs,addNotificationStaffs,addStaffForm,editStaffForm,adminUpdateProfileForm
 
 from .models import CustomUser, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff,Admin
 
 	#managing session periods
 def manage_session(request):
-	session_years = SessionYearModel.objects.all()
+	session_years = SessionYearModel.objects.all().order_by('-current')
 	context = {
 		"session_years": session_years
 	}
-	return render(request, "admin_templates/manage_session_template.html", context)
+	return render(request, "Admin_templates/manage_session_template.html", context)
 
-
+ 
 def add_session(request):
 	form = addSessionYearModelForm()
-	context = {
-		"form":form
-	}
-	return render(request, "admin_templates/add_session_template.html",context)
-
-
-def add_session_save(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method")
-		return redirect('add_course')
-	else:
+	if request.method == "POST":
+		
 		form = addSessionYearModelForm(request.POST, request.FILES)
 		if form.is_valid():
-
+			print("form is valid ")
+			selected_term = form.cleaned_data['school_term']
 			session_start_year = form.cleaned_data['session_start_year']
 			session_end_year = form.cleaned_data['session_end_year']
 
 		try:
-			sessionyear = SessionYearModel(session_start_year=session_start_year,
+			sessionyear = SessionYearModel(school_term=selected_term,session_start_year=session_start_year,
 										session_end_year=session_end_year)
 			sessionyear.save()
 			messages.success(request, "Session Year added Successfully!")
-			return redirect("add_session")
+			return redirect("school:add_session")
 		except:
+			print("form is invalid ")
 			messages.error(request, "Failed to Add Session Year")
-			return redirect("add_session")
+			return redirect("school:add_session")
+	else:
+		form = addSessionYearModelForm()
+	context = {
+		"form":form
+	}
+	return render(request, "Admin_templates/add_session_template.html",context)
 
 
 def edit_session(request, session_id):
 	session_year = SessionYearModel.objects.get(id=session_id)
-	# Adding Student ID into Session Variable
-	request.session['session_id'] = session_id
+	form = editSessionYearModelForm(request.POST, request.FILES,instance=session_year)
 
-	form = editSessionYearModelForm() 
-	form.fields["session_start_year"].initial = session_year.session_start_year
-	form.fields["session_end_year"].initial = session_year.session_end_year
-
-	context = {
-		"session_year": session_year,
-		"form":form
-	}
-	return render(request, "admin_templates/edit_session_template.html", context)
-
-
-def edit_session_save(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method!")
-		return redirect('manage_session')
-	else:
-		session_id = request.session.get('session_id')
-		if session_id == None:
-			return redirect("/manage_session")
-
-		form = editSessionYearModelForm(request.POST, request.FILES)
+	if request.method == "POST":
+		print(" it is a ggggggggggggggggpost")
+		form = editSessionYearModelForm(request.POST, request.FILES,instance=session_year)
+		
 		if form.is_valid():
+			print("for is valid")
+			form.save()
+			return HttpResponseRedirect(request.POST, request.FILES,request.path_info)
+		else:
+			print("form is invalid")
+			form = editSessionYearModelForm(request.POST, request.FILES,instance=session_year)
+			context ={
+				"form":form
+			}
+			
+			return render(request, "Admin_templates/edit_session_template.html", context)
+	
+			
+	context= {
+				"form":form
+			}
+	return render(request, "Admin_templates/edit_session_template.html", context)
 
-			session_start_year = form.cleaned_data['session_start_year']
-			session_end_year = form.cleaned_data['session_end_year']
 
-		try:
-			session_year = SessionYearModel.objects.get(id=session_id)
-			session_year.session_start_year = session_start_year
-			session_year.session_end_year = session_end_year
-			session_year.save()
-			# Delete  SESSION after the data is updated
-			del request.session['session_id']
+# def edit_session(request):
+# 	if request.method != "POST":
+# 		messages.error(request, "Invalid Method!")
+# 		return redirect('manage_session')
+# 	else:
+# 		session_id = request.session.get('session_id')
+# 		if session_id == None:
+# 			return redirect("/manage_session")
 
-			messages.success(request, "Session Year Updated Successfully.")
-			return redirect('/edit_session/'+session_id)
-		except:
-			messages.error(request, "Failed to Update Session Year.")
-			return redirect('/edit_session/'+session_id)
+# 		form = editSessionYearModelForm(request.POST, request.FILES)
+# 		if form.is_valid():
+
+# 			session_start_year = form.cleaned_data['session_start_year']
+# 			session_end_year = form.cleaned_data['session_end_year']
+
+# 		try:
+# 			session_year = SessionYearModel.objects.get(id=session_id)
+# 			session_year.session_start_year = session_start_year
+# 			session_year.session_end_year = session_end_year
+# 			session_year.save()
+# 			# Delete  SESSION after the data is updated
+# 			del request.session['session_id']
+
+# 			messages.success(request, "Session Year Updated Successfully.")
+# 			return redirect('/edit_session/'+session_id)
+# 		except:
+# 			messages.error(request, "Failed to Update Session Year.")
+# 			return redirect('/edit_session/'+session_id)
 
 
 def delete_session(request, session_id):
@@ -100,10 +111,10 @@ def delete_session(request, session_id):
 	try:
 		session.delete()
 		messages.success(request, "Session Deleted Successfully.")
-		return redirect('manage_session')
+		return redirect('school:manage_session')
 	except:
 		messages.error(request, "Failed to Delete Session.")
-		return redirect('manage_session')
+		return redirect('school:manage_session')
 
 
 def admin_home(request):
@@ -186,7 +197,7 @@ def admin_home(request):
 	return render(request, "admin-dashboard.html", context)
 
 
-def add_staff(request):
+def add_staff_save(request):
 	form = addStaffForm()
 	context = {
 		"form": form
@@ -194,11 +205,8 @@ def add_staff(request):
 	return render(request, "admin_templates/add_staff_template.html", context)
 
 
-def add_staff_save(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method ")
-		return redirect('add_staff')
-	else:
+def add_staff(request):
+	if request.method == "POST":
 		form = addStaffForm(request.POST, request.FILES)
 		if form.is_valid():
 
@@ -240,6 +248,12 @@ def add_staff_save(request):
 			except:
 				messages.error(request, "Failed to Add Staff!")
 				return redirect('add_staff')
+	else:
+		form = addStaffForm()
+		context = {
+		"form": form
+		}
+		return render(request, "admin_templates/add_staff_template.html", context)
 
 
 
@@ -349,7 +363,7 @@ def delete_staff(request, staff_id):
 		return redirect('manage_staff')
 
 
-def add_teacher(request):
+def add_teacher_save(request):
 	form = addStaffForm()
 	context = {
 		"form": form
@@ -357,11 +371,8 @@ def add_teacher(request):
 	return render(request, "admin_templates/add_staff_template.html", context)
 
 
-def add_teacher_save(request):
+def add_teacher(request):
 	if request.method != "POST":
-		messages.error(request, "Invalid Method ")
-		return redirect('add_staff')
-	else:
 		form = addStaffForm(request.POST, request.FILES)
 		if form.is_valid():
 
@@ -403,7 +414,12 @@ def add_teacher_save(request):
 			except:
 				messages.error(request, "Failed to Add Staff!")
 				return redirect('add_staff')
-
+	else:
+		form = addStaffForm()
+		context = {
+		"form": form
+		}
+		return render(request, "admin_templates/add_staff_template.html", context)
 
 
 def manage_teacher(request):
@@ -512,36 +528,41 @@ def delete_staff(request, staff_id):
 		return redirect('manage_staff')
 
 
+
+
 def add_class(request):
-	form = addClassForm()
-
-	context = {"form":form}
-	return render(request, "admin_templates/add_class_template.html",context)
-
-
-def add_class_save(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method!")
-		return redirect('add_class')
-	else:
+	form = addSessionYearModelForm()
+	
+	if request.method == "POST":
+		print("its a post")
 		form = addClassForm(request.POST, request.FILES)
 		
 		if form.is_valid():
 			name =  form.cleaned_data["name"]
 			sessionperiod = form.cleaned_data["sessionperiod"]
 			class_teacher = form.cleaned_data["class_teacher"]
+			print(class_teacher)
+			selected_session = SessionYearModel.objects.get(id=sessionperiod)
+			selected_class_teacher = CustomUser.objects.get(id=class_teacher)
+			print("selected_session",selected_session)
+			print("selected_class_teacher",selected_class_teacher)
 			new_class = Classes(
 				name=name,
-				session=sessionperiod,
-				class_teacher=class_teacher
+				sessionperiod_id='Third Term 2023-09-04 to 2023-12-04',
+				class_teacher=selected_class_teacher
 			)
 			new_class.save()
 			
 			messages.success(request, "Class Added Successfully!")
-			return redirect('add_class')
+			return redirect('school:add_class')
 		
 		messages.error(request, "Failed to Add Class!")
-		return redirect('add_class')
+		return redirect('school:add_class')
+	else:
+		form = addClassForm()
+
+		context = {"form":form}
+		return render(request, "Admin_templates/add_class_template.html",context)
 
 
 def manage_class(request):
@@ -549,62 +570,59 @@ def manage_class(request):
 	context = {
 		"classes": classes
 	}
-	return render(request, 'admin_templates/manage_class_template.html', context)
+	return render(request, 'Admin_templates/manage_classes.html', context)
 
-
-def edit_class(request, class_id):
-	classes = Classes.objects.get(id=class_id)
-
-	#adding class ID  into session variable
-	request.session["class_id"] = class_id
-
-	form = editClassForm()
-	
-	# Filling the form with Data from Database
-	form.fields["name"]=classes.name
-	form.fields["sessionperiod"]=classes.sessionperiod
-	form.fields["class_teacher"]=classes.class_teacher
+def previous_class(request):
+	classes = Classes.objects.all()
 	context = {
-		"classes": classes,
-		"id": class_id,
-		"form":form
+		"classes": classes
 	}
+	return render(request, 'Admin_templates/previous_classes.html', context)
 
-	return render(request, 'admin_templates/edit_class_template.html', context)
+
+# def edit_class_save(request, class_id):
+# 	classes = Classes.objects.get(id=class_id)
+
+# 	#adding class ID  into session variable
+# 	request.session["class_id"] = class_id
+
+# 	form = editClassForm()
+	
+# 	# Filling the form with Data from Database
+# 	form.fields["name"]=classes.name
+# 	form.fields["sessionperiod"]=classes.sessionperiod
+# 	form.fields["class_teacher"]=classes.class_teacher
+# 	context = {
+# 		"classes": classes,
+# 		"id": class_id,
+# 		"form":form
+# 	}
+
+# 	return render(request, 'admin_templates/edit_class_template.html', context)
 
 
-def edit_class_save(request):
-	if request.method != "POST":
-		HttpResponse("Invalid Method")
-	else:
-		class_id = request.session.get('class_id')
-		if class_id == None:
-			return redirect('/edit_class')
-
-		form = editClassForm()
+def edit_class(request,class_id):
+	
+	class_prof = get_object_or_404(Classes, id=class_id)
+	form = editClassForm(request.POST, request.FILES, instance=class_prof)
+	if request.method == "POST":
+		print("class post")
+		form = editClassForm(request.POST, request.FILES, instance=class_prof)
 		if form.is_valid():
-			name = form.cleaned_data["name"]
-			sessionperiod = form.cleaned_data["sessionperiod"]
-			class_teacher = form.cleaned_data["class_teacher"]
-
-
-			try:
-				classes= Classes.objects.get(id=class_id)
-				classes.name= name
-				classes.sessionperiod=sessionperiod
-				classes.class_teacher=class_teacher
-				classes.save()
-				
-				# Delete  SESSION after the data is updated
-				del request.session['class_id']
-				messages.success(request, "Class Updated Successfully.")
-				return redirect('/edit_class/'+class_id)
-			except:
-				messages.error(request, "Failed to Update class.")
-			return redirect('/edit_class/'+class_id)
+			form.save()
+			return HttpResponseRedirect(request.path_info)
 
 		else:
-			return redirect('/edit_class/'+class_id)
+			form = editClassForm(request.POST, request.FILES, instance=class_prof)
+
+		context = {
+			"form":form
+		}
+		return render(request, 'Admin_templates/edit_classes.html', context)
+	context = {
+			"form":form
+		}
+	return render(request, 'Admin_templates/edit_classes.html', context)
 
 
 def delete_class(request, class_id):
@@ -621,89 +639,246 @@ def delete_class(request, class_id):
 
 
 
-def add_student(request):
-	form = AddStudentForm()
+# def add_student(request):
+# 	form = AddStudentForm()
+# 	context = {
+# 		"form": form
+# 	}
+# 	return render(request, 'add-student.html', context)
+
+
+def student_view(request,student_id):
+	student = get_object_or_404(Students,id=student_id)
 	context = {
-		"form": form
+		"student":student
 	}
-	return render(request, 'admin_templates/add_student_template.html', context)
+	return render(request, 'Admin_templates/student_details.html', context)
+
+def studentReg(request):
+    form = CreateUserForm()
+    if request.method == "POST":
+        form = CreateUserForm(request.POST, request.FILES)
+        if form.is_valid():
+            
+            first_name = form.cleaned_data['firstname']
+            last_name = form.cleaned_data.get('lastname')
+            email_id = form.cleaned_data.get('email')
+            
+            password = form.cleaned_data.get('password1')
+            confirm_password = form.cleaned_data.get('password2')
+
+
+        user_type = get_user_type_from_email(email_id)
+        print(user_type)
+
+        if user_type is None:
+            messages.error(request, "Please use valid format for the email id: '<username>.<staff|student|hod>@<college_domain>'")
+            # return render(request, 'auth/registration.html',context)
+
+        username = email_id.split('@')[0].split('.')[0]
+        print(username)
+
+        user = CustomUser()
+        user.username = username
+        user.email = email_id
+        # user.password = password
+        user.user_type = user_type
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        
+
+        if user_type == CustomUser.STAFF:
+            Staffs.objects.create(users_type=user)
+        elif user_type == CustomUser.STUDENT:
+            Students.objects.create(users_type=user)
+        elif user_type == CustomUser.ADMIN:
+            Admin.objects.create(users_type=user)
+        elif user_type == CustomUser.TEACHER:
+            Staffs.objects.create(users_type=user)
+        return redirect("school:doLogin")
+
+    context = {
+                            "form": form
+        }
+    return render(request, 'auth/registration.html', context)
+
+
+def get_user_type_from_email(email_id):
+    """
+    Returns CustomUser.user_type corresponding to the given email address
+    email_id should be in following format:
+    '<username>.<staff|student|hod>@<college_domain>'
+    eg.: 'abhishek.staff@jecrc.com'
+    """
+
+    try:
+        email_id = email_id.split('@')[0]
+        email_user_type = email_id.split('.')[1]
+        return CustomUser.EMAIL_TO_USER_TYPE_MAP[email_user_type]
+    except:
+        return None
+
+def add_student(request):
+	form = AddStudentForm()	
+
+	if request.method == "POST":
+		form = AddStudentForm(request.POST or None,request.FILES)
+		print("form")
+		profile_pic= request.POST.get('profile_pic')
+		first_name = request.POST.get('first_name')
+		last_name = request.POST.get('last_name')
+		email = request.POST.get('email')
+		student_ID = request.POST.get('student_ID')
+		address = request.POST.get('residential_address')
+		session_year_id = request.POST.get('session_year_id')
+		class_id = request.POST.get('class_id')
+		subject_id = request.POST.get('subject_id')
+		kcpe_marks = request.POST.get('kcpe_marks')
+		gender = request.POST.get('gender')
+		fathers_name = request.POST.get('fathers_name')
+		fathers_email = request.POST.get('fathers_email')
+		fathers_phonenumber = request.POST.get('fathers_phonenumber')
+		mothers_name = request.POST.get('mothers_name')
+		mothers_email = request.POST.get('mothers_email')
+		mothers_phonenumber = request.POST.get('mothers_phonenumber')
+		residential_address = request.POST.get('residential_address')
+		admission_date = request.POST.get('admission_date')
+
+		username = email.split('@')[0].split('.')[0]
+		print(first_name,last_name,email,student_ID,address,session_year_id,class_id,subject_id,kcpe_marks,gender,fathers_name,fathers_email,fathers_phonenumber,mothers_name,mothers_email,mothers_phonenumber,residential_address,admission_date)
+
+
+		try:
+			user = CustomUser.objects.create_user(username=username,
+												password=student_ID,
+												email=email,
+												first_name=first_name,
+												last_name=last_name,
+												
+
+												user_type=4)
+			user.students.address = address
+			user.students.kcpe_marks =kcpe_marks
+			subject_obj = Subjects.objects.get(id=subject_id)
+			user.students.subject_id =subject_obj
+
+			class_obj = Classes.objects.get(id=class_id)
+			user.students.student_class = class_obj
 
 
 
+			session_year_obj = SessionYearModel.objects.get(id=session_year_id)
+			print("session found",session_year_obj)
+			user.students.session_year_id = session_year_obj
 
-def add_student_save(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method")
-		return redirect('add_student')
-	else:
-		form = AddStudentForm(request.POST, request.FILES)
+			user.students.gender = gender
+			user.students.profile_pic = profile_pic
+			user.students.fathers_name = fathers_name
+			user.students.mothers_name = mothers_name
+			user.students.admitted_at = admission_date
+			user.students.fathers_number = fathers_phonenumber
+			user.students.fathers_email = fathers_email
+			user.students.mothers_email = mothers_email
+			user.students.mothers_number = mothers_phonenumber
+			user.students.residential_address = residential_address
+			user.save()
+			messages.success(request, "Student Added Successfully!")
+			return HttpResponseRedirect('add_student')
 
-		if form.is_valid():
-			first_name = form.cleaned_data['first_name']
-			last_name = form.cleaned_data['last_name']
-			username = form.cleaned_data['username']
-			email = form.cleaned_data['email']
-			password = form.cleaned_data['password']
-			address = form.cleaned_data['address']
-			session_year_id = form.cleaned_data['session_year_id']
-			class_id = form.cleaned_data['class_id']
-			subject_id = form.cleaned_data['subject_id']
-			kcpe_marks = form.cleaned_data['kcpe_marks']
-			gender = form.cleaned_data['gender']
+		# if form.is_valid():
+		# 	print("form is valid")
+		# 	# student = form.save(commit=False)
+		# 	first_name = form.cleaned_data.get('first_name')
+		# 	last_name = form.cleaned_data['last_name']
+		# 	username = form.cleaned_data['username']
+		# 	email = form.cleaned_data['email']
+		# 	password = form.cleaned_data['password']
+		# 	address = form.cleaned_data['address']
+		# 	session_year_id = form.cleaned_data['session_year_id']
+		# 	print(session_year_id)
+		# 	class_id = form.cleaned_data['class_id']
+		# 	subject_id = form.cleaned_data['subject_id']
+		# 	kcpe_marks = form.cleaned_data['kcpe_marks']
+		# 	gender = form.cleaned_data['gender']
+		# 	fathers_name = form.cleaned_data['fathers_name']
+		# 	fathers_email = form.cleaned_data['fathers_email']
+		# 	fathers_phonenumber = form.cleaned_data['fathers_phonenumber']
+		# 	mothers_name = form.cleaned_data['mothers_name']
+		# 	mothers_email = form.cleaned_data['mothers_email']
+		# 	mothers_phonenumber = form.cleaned_data['mothers_phonenumber']
+		# 	residential_address = form.cleaned_data['residential_address']
+
+		# 	print(residential_address)
 
 			
-			if len(request.FILES) != 0:
-				profile_pic = request.FILES['profile_pic']
-				fs = FileSystemStorage()
-				filename = fs.save(profile_pic.name, profile_pic)
-				profile_pic_url = fs.url(filename)
-			else:
-				profile_pic_url = None
+		# 	if len(request.FILES) != 0:
+		# 		profile_pic = request.FILES['profile_pic']
+		# 		fs = FileSystemStorage()
+		# 		filename = fs.save(profile_pic.name, profile_pic)
+		# 		profile_pic_url = fs.url(filename)
+		# 	else:
+		# 		profile_pic_url = ""
 
 
-			try:
-				user = CustomUser.objects.create_user(username=username,
-													password=password,
-													email=email,
-													first_name=first_name,
-													last_name=last_name,
+		# 	try:
+		# 		user = CustomUser.objects.create_user(username=username,
+		# 											password=password,
+		# 											email=email,
+		# 											first_name=first_name,
+		# 											last_name=last_name,
 													
 
-													user_type=4)
-				user.students.address = address
-				user.students.kcpe_marks =kcpe_marks
-				subject_obj = Subjects.objects.get(id=subject_id)
-				user.students.subject_id =subject_obj
+		# 											user_type=4)
+		# 		user.students.address = address
+		# 		user.students.kcpe_marks =kcpe_marks
+		# 		subject_obj = Subjects.objects.get(id=subject_id)
+		# 		user.students.subject_id =subject_obj
 
-				class_obj = Classes.objects.get(id=class_id)
-				user.students.student_class = class_obj
+		# 		class_obj = Classes.objects.get(id=class_id)
+		# 		user.students.student_class = class_obj
 
 
 
-				session_year_obj = SessionYearModel.objects.get(id=session_year_id)
-				user.students.session_year_id = session_year_obj
+		# 		session_year_obj = SessionYearModel.objects.get(id=session_year_id)
+		# 		print("session found",session_year_obj)
+		# 		user.students.session_year_id = session_year_obj
 
-				user.students.gender = gender
-				user.students.profile_pic = profile_pic_url
-				user.save()
-				messages.success(request, "Student Added Successfully!")
-				return redirect('add_student')
-			except:
-				messages.error(request, "Failed to Add Student!")
-				return redirect('add_student')
-		else:
-			return redirect('add_student')
+		# 		user.students.gender = gender
+		# 		user.students.profile_pic = profile_pic_url
+		# 		user.save()
+		# 		messages.success(request, "Student Added Successfully!")
+		# 		return HttpResponseRedirect('add_student')
+		# 	except:
+		# 		messages.error(request, "Failed to Add Student!")
+		# 		return HttpResponseRedirect('add_student')
+		
+		except:
+		
+			form = AddStudentForm()	
+				
+			context = {
+				'form': form
+			}
+			print("invalid")
+			return render(request, 'Admin_templates/add_student.html', context)
+	context = {
+			'form': form
+			}
+
+	return render(request, 'Admin_templates/add_student.html', context)
+				
 
 
 def manage_student(request):
 	students = Students.objects.all()
 	context = {
 		"students": students
-	}
-	return render(request, 'admin_templates/manage_student_template.html', context)
+	} 
+	return render(request, 'Admin_templates/manage_students.html', context)
 
 
-def edit_student(request, student_id):
+def edit_student_save(request, student_id):
 
 	# Adding Student ID into Session Variable
 	request.session['student_id'] = student_id
@@ -717,24 +892,22 @@ def edit_student(request, student_id):
 	form.fields['first_name'].initial = student.users_type.first_name
 	form.fields['last_name'].initial = student.users_type.last_name
 	form.fields['address'].initial = student.address
-	form.fields['student_class'].initial = student.student_class.id
-	form.fields['subject_id'].initial = student.subject_id.id
+	form.fields['class_id'].initial = student.student_class
+	form.fields['subject_id'].initial = student.subject_id
 	form.fields['kcpe_marks'].initial = student.kcpe_marks
 	form.fields['gender'].initial = student.gender
-	form.fields['session_year_id'].initial = student.session_year_id.id
+	form.fields['session_year_id'].initial = student.session_year_id
 
 	context = {
 		"id": student_id,
 		"username": student.users_type.username,
 		"form": form
 	}
-	return render(request, "admin_templates/edit_student_template.html", context)
+	return render(request, "edit-student.html", context)
 
 
-def edit_student_save(request):
-	if request.method != "POST":
-		return HttpResponse("Invalid Method!")
-	else:
+def edit_student(request,student_id):
+	if request.method == "POST":
 		student_id = request.session.get('student_id')
 		if student_id == None:
 			return redirect('/manage_student')
@@ -801,7 +974,18 @@ def edit_student_save(request):
 				return redirect('/edit_student/'+student_id)
 		else:
 			return redirect('/edit_student/'+student_id)
+	else:
+		print("not post")
+		student_obj = Students.objects.get(id=student_id)
+		print(student_obj)
+		form = EditStudentForm(request.POST, request.FILES,instance=student_obj)
+		context= {
+			"form":form
+		}
 
+		return render(request, "edit-student.html", context)
+
+		
 
 def delete_student(request, student_id):
 	student = Students.objects.get(users_type=student_id)

@@ -21,7 +21,7 @@
                {% else %}
                <ul>
              
-                  <li><a href="{% url 'school:teacher' %}">Teacher Dashboard</a></li>                 
+                  <li><a href="{% url 'school:staff_home' %}">Teacher Dashboard</a></li>                 
                </ul>
                 {% endif %}
               
@@ -29,10 +29,10 @@
              <li class="submenu">
                 <a href="#"><i class="fas fa-user-graduate"></i> <span> Students</span> <span class="menu-arrow"></span></a>
                 <ul>
-                   <li><a href="students.html">Student List</a></li>
-                   <li><a href="student-details.html">Student View</a></li>
-                   <li><a href="add-student.html">Student Add</a></li>
-                   <li><a href="edit-student.html">Student Edit</a></li>
+                   <li><a href="{% url 'school:manage_student'%}">Student List</a></li>
+                   
+                   <li><a href="{% url 'school:add_student'%}">Student Add </a></li>
+                   <!-- <li><a href="{% url 'school:edit_student' 6 %}">Student Edit</a></li> -->
                 </ul>
              </li>
              <li class="submenu">
@@ -41,15 +41,15 @@
                    <li><a href="teachers.html">Teacher List</a></li>
                    <li><a href="teacher-details.html">Teacher View</a></li>
                    <li><a href="add-teacher.html">Teacher Add</a></li>
-                   <li><a href="edit-teacher.html">Teacher Edit</a></li>
+                   <!-- <li><a href="edit-teacher.html">Teacher Edit</a></li> -->
                 </ul>
-             </li>
+             </li> 
              <li class="submenu">
-                <a href="#"><i class="fas fa-building"></i> <span> Departments</span> <span class="menu-arrow"></span></a>
+                <a href="#"><i class="fas fa-building"></i> <span> Classes</span> <span class="menu-arrow"></span></a>
                 <ul>
-                   <li><a href="departments.html">Department List</a></li>
-                   <li><a href="add-department.html">Department Add</a></li>
-                   <li><a href="edit-department.html">Department Edit</a></li>
+                   <li><a href="{% url 'school:manage_classes'%}">Classes List</a></li>
+                   <li><a href="{% url 'school:add_class' %}">Classes Add</a></li>
+                   <!-- <li><a href="edit-department.html">Classes Edit</a></li> -->
                 </ul>
              </li>
              <li class="submenu">
@@ -74,6 +74,9 @@
                    <li><a href="add-salary.html">Add Salary</a></li>
                 </ul>
              </li>
+             <li>
+               <a href="{% url 'school:manage_session' %}"><i class="fas fa-holly-berry"></i> <span>School Sessions</span></a>
+            </li>
              <li>
                 <a href="holiday.html"><i class="fas fa-holly-berry"></i> <span>Holiday</span></a>
              </li>

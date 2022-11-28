@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.validators import MaxValueValidator, MinValueValidator
+from datetime import date
 
 
 # Create your models here.
@@ -12,19 +13,21 @@ terms = (
     ("Second Term","Second Term"),
     ("Third Term","Third Term"),
 
-    ) 
+    )  
 
 class SessionYearModel(models.Model):
     id = models.AutoField(primary_key=True)
     school_term = models.CharField(choices=terms,max_length=100)
     session_start_year = models.DateField()
     session_end_year = models.DateField()
+    current = models.BooleanField(default=False)
     objects = models.Manager()
 
 
     def __str__(self):
-        return '{}  {} to {} '.format(self.school_term, self.session_start_year , self.session_end_year) 
+        return '{}  {} to {} '.format(self.school_term, self.session_start_year , self.session_end_year)
 
+    
 
     class Meta:
         unique_together=("school_term", "session_start_year", "session_end_year")
@@ -46,7 +49,7 @@ class CustomUser(AbstractUser):
     user_type_data = ((ADMIN, "ADMIN"),(TEACHER, "TEACHER"), (STAFF, "Staff"), (STUDENT, "Student"))
     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
 
-
+  
 genders = (
     ("Male", "Male"),
     ("Female","Female"),
@@ -135,7 +138,7 @@ class_list =(
 class Classes(models.Model):
     id =models.AutoField(primary_key=True)
     name = models.CharField(choices=class_list,max_length=1000)
-    sessionperiod = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING,null = True)
+    sessionperiod = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING,null = True,blank=True)
     class_teacher = models.ForeignKey(CustomUser,on_delete=models.DO_NOTHING, null = True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -146,7 +149,7 @@ class Classes(models.Model):
 
 
     class Meta:
-        unique_together=("name", "sessionperiod")
+        unique_together=("name", "sessionperiod_id")
 
 class Subjects(models.Model):
     id =models.AutoField(primary_key=True)
@@ -163,7 +166,7 @@ class Subjects(models.Model):
 
     def __str__(self):
         return "{} {}".format(self.subject_name,self.class_id)
-
+ 
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
     users_type = models.OneToOneField(CustomUser,on_delete=models.DO_NOTHING, default=1)
@@ -173,11 +176,18 @@ class Students(models.Model):
     student_id = models.CharField(max_length=150)
     student_class = models.ForeignKey(Classes,on_delete=models.DO_NOTHING,null=True)
     subject_id = models.ManyToManyField(Subjects)
-    session_year_id = models.ForeignKey(SessionYearModel, null=True,
-                                        on_delete=models.DO_NOTHING)
+    session_year_id = models.ForeignKey(SessionYearModel, null=True,blank=True,on_delete=models.DO_NOTHING)
     kcpe_marks = models.IntegerField(default=0,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    admitted_at = models.DateTimeField(auto_now=True)
+    fathers_name = models.CharField(max_length=250)
+    fathers_number = models.IntegerField()
+    fathers_email = models.EmailField(max_length=250)
+    mothers_name = models.CharField(max_length=250)
+    mothers_number = models.IntegerField()
+    mothers_email = models.EmailField(max_length=250)
+    residential_address = models.CharField(max_length=250)
     objects = models.Manager()
 
     def __str__(self):

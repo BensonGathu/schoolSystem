@@ -1,0 +1,91 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block content %}
+
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+         <div class="page-wrapper">
+            <div class="content container-fluid">
+               <div class="page-header">
+                  <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="page-title">Manage School Session</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item active" >School Sessions</li>
+                           <li class="breadcrumb-item " ><a href="{% url 'school:add_session' %}"> Add School Session </a></li>
+                        </ul>
+                     </div>
+                     <div class="col-auto text-right float-right ml-auto">
+                        <a href="#" class="btn btn-outline-primary mr-2"><i class="fas fa-download"></i> Download</a>
+                        <a href="{% url 'school:add_session' %}" class="btn btn-primary"><i class="fas fa-plus"></i></a>
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-sm-12">
+                     <div class="card card-table">
+                        <div class="card-body">
+                           <div class="table-responsive">
+                              <table class="table table-hover table-center mb-0 datatable">
+                                 <thead>
+                                    <tr>
+                                       
+                                       <th>Term</th>
+                                       <th>Start</th>
+                                       <th>End</th>
+                                       <th>Status</th>
+                                       <th class="text-right">Action</th>
+                                    </tr>
+                                 </thead>
+                                 {% for session in session_years %}  
+                                 <tbody>
+                                
+                           
+                                    <tr>
+                                       <td>{{session.school_term}}</td>
+                                       <td>
+                                          <h2>
+                                             <a>{{session.session_start_year}}</a>
+                                          </h2>
+                                       </td>
+                                       <td>{{session.session_end_year}}</td>
+
+                                    {% if session.current %}
+                                    <td> <span class="label label-success">Current</span></td>
+                                    {% else%}
+                                    <td> Not Current</td>
+                                    {% endif %}
+                                       <td class="text-right">
+                                          <div class="actions">
+                                             <a href="{% url 'school:edit_session' session.id %}" class="btn btn-sm bg-success-light mr-2">
+                                             <i class="fas fa-pen"></i>
+                                             </a>
+                                             <a href="{% url 'school:delete_session' session.id %} class="btn btn-sm bg-danger-light">
+                                             <i class="fas fa-trash"></i>
+                                             </a>
+                                          </div>
+                                       </td>
+                                    </tr>
+                                 </tbody>
+                                 {% endfor %}
+                              </table>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <footer>
+               <p>Copyright © 2020 Dreamguys.</p>
+            </footer>
+         </div>
+
+     </script>
+   </body>
+
+
+   
+   {% endblock %}
+   
