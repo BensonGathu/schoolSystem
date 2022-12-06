@@ -3,16 +3,19 @@
        <div id="sidebar-menu" class="sidebar-menu">
           <ul>
              <li class="menu-title">
-                <span>Main Menu</span>
+                <span>Main Menu</span> 
              </li>
              <li class="submenu active">
-                <a href="#"><i class="fas fa-user-graduate"></i> <span> Dashboard</span> <span class="menu-arrow"></span></a> {% if request.user.user_type == "1" %}
+                <a href="#"><i class="fas fa-user-graduate"></i> <span> Dashboard</span> <span class="menu-arrow"></span>
+               </a>
+                {% if request.user.is_teacher %}
                 <ul>
-                  <li><a href="{% url 'school:admin_home' %}" class="active">Admin Dashboard</a></li>
-
+             
+                  <li><a class="submenu" href="{% url 'school:staff_home' %}">Teacher Dashboard</a></li>                 
                </ul>
              
-               {% elif request.user.user_type == "4" %}
+             
+               {% elif request.user.is_student %}
           
                <ul>
              
@@ -20,12 +23,15 @@
                </ul>
                {% else %}
                <ul>
-             
-                  <li><a href="{% url 'school:staff_home' %}">Teacher Dashboard</a></li>                 
+                  <li><a href="{% url 'school:admin_home' %}" class="active">Admin Dashboard</a></li>
+
                </ul>
+
+
                 {% endif %}
               
              </li>
+             {% if request.user.is_admin %} 
              <li class="submenu">
                 <a href="#"><i class="fas fa-user-graduate"></i> <span> Students</span> <span class="menu-arrow"></span></a>
                 <ul>
@@ -38,9 +44,9 @@
              <li class="submenu">
                 <a href="#"><i class="fas fa-chalkboard-teacher"></i> <span> Teachers</span> <span class="menu-arrow"></span></a>
                 <ul>
-                   <li><a href="teachers.html">Teacher List</a></li>
-                   <li><a href="teacher-details.html">Teacher View</a></li>
-                   <li><a href="add-teacher.html">Teacher Add</a></li>
+                   <li><a href="{% url 'school:manage_teachers'%}">Teacher List</a></li>
+                   <!-- <li><a href="teacher-details.html">Teacher View</a></li> -->
+                   <li><a href="{% url 'school:add_staff' %}">Teacher Add</a></li>
                    <!-- <li><a href="edit-teacher.html">Teacher Edit</a></li> -->
                 </ul>
              </li> 
@@ -55,14 +61,16 @@
              <li class="submenu">
                 <a href="#"><i class="fas fa-book-reader"></i> <span> Subjects</span> <span class="menu-arrow"></span></a>
                 <ul>
-                   <li><a href="subjects.html">Subject List</a></li>
-                   <li><a href="add-subject.html">Subject Add</a></li>
-                   <li><a href="edit-subject.html">Subject Edit</a></li>
+                   <li><a href="{% url 'school:manage_subject'%}">Subject List</a></li>
+                   <li><a href="{% url 'school:add_subject'%}">Subject Add</a></li>
+                   
                 </ul>
              </li>
+             {% endif %}
              <li class="menu-title">
                 <span>Management</span>
              </li>
+             {% if request.user.is_admin %} 
              <li class="submenu">
                 <a href="#"><i class="fas fa-file-invoice-dollar"></i> <span> Accounts</span> <span class="menu-arrow"></span></a>
                 <ul>
@@ -74,27 +82,31 @@
                    <li><a href="add-salary.html">Add Salary</a></li>
                 </ul>
              </li>
+             
              <li>
                <a href="{% url 'school:manage_session' %}"><i class="fas fa-holly-berry"></i> <span>School Sessions</span></a>
             </li>
+            
              <li>
                 <a href="holiday.html"><i class="fas fa-holly-berry"></i> <span>Holiday</span></a>
              </li>
              <li>
                 <a href="fees.html"><i class="fas fa-comment-dollar"></i> <span>Fees</span></a>
+             </li>{% endif %}
+                <li>
+                <a href="event.html"><i class="fas fa-calendar-day"></i> <span>Lesson Plan</span></a>
              </li>
              <li>
-                <a href="exam.html"><i class="fas fa-clipboard-list"></i> <span>Exam list</span></a>
+                <a href="exam.html"><i class="fas fa-clipboard-list"></i> <span>Exam</span></a>
              </li>
-             <li>
-                <a href="event.html"><i class="fas fa-calendar-day"></i> <span>Events</span></a>
-             </li>
+          
              <li>
                 <a href="time-table.html"><i class="fas fa-table"></i> <span>Time Table</span></a>
              </li>
              <li>
-                <a href="library.html"><i class="fas fa-book"></i> <span>Library</span></a>
+                <a href="library.html"><i class="fas fa-book"></i> <span>Leave</span></a>
              </li>
+           
              <li class="menu-title">
                 <span>Pages</span>
              </li>

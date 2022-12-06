@@ -1,0 +1,180 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block content %}
+
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+         <div class="page-wrapper">
+            <div class="content container-fluid">
+               <div class="page-header">
+                  <div class="row align-items-center">
+                     <div class="col">
+                        <h3 class="page-title">Edit Student</h3>
+                        <ul class="breadcrumb">
+                           <li class="breadcrumb-item"><a href="{% url 'school:manage_student' %}">Students</a></li>
+                           <li class="breadcrumb-item active">Edit Student</li>
+                        </ul>
+                     </div>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-sm-12">
+                     <div class="card">
+                        <div class="card-body">
+                          
+                           <form method="post">
+                              {% csrf_token %}
+                              
+                              <div class="row">
+                                 <div class="col-12">
+                                    <h5 class="form-title"><span>Student Information</span></h5>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label> Admission Number </label>{{form.student_ID}}
+                                       
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group" >
+                                       <label>Admission Date</label>
+                                       <div>
+                                          {{form.admission_date}}
+                                       </div>
+                                    </div>
+                                 </div>
+ 
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Student Email</label>
+                                       {{form.email}}
+                                    </div>
+                                 </div>
+                               
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group" placeholder="First Name">
+                                       <label >First Name </label>{{form.first_name}}
+                                     
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label> Last Name</label>{{form.last_name}}
+                                       
+                                    </div>
+                                 </div>
+                                 
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Gender</label>
+                                   {{form.gender}}
+                                    </div>
+                                 </div>
+
+                               
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group" placeholder="First Name">
+                                       <label >KCPE Marks {{form.kcpe_marks}}</label>
+                                     
+                                    </div>
+                                 </div>
+                               
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Student House</label>
+                                       {{form.student_house}}
+                                    </div>
+                                 </div>
+                            
+                          
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Student Image</label>
+                                       {{form.profile_pic}}
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Session</label>
+                                          {{form.session_year_id}}
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Class</label>
+                                          {{form.class_id}}
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Subjects</label>
+                                          {{form.subject_id}}
+                                    </div>
+                                 </div>
+                                 <div class="col-12">
+                                    <h5 class="form-title"><span>Parent Information</span></h5>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Father's Name</label>
+                                       {{form.fathers_name }}
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Father's Email</label>
+                                       {{form.fathers_email }}
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Father's Mobile</label>
+                                       {{form.fathers_phonenumber }}
+                                    </div>
+                                 </div>
+                              
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Mother's Name</label>
+                                       {{form.mothers_name }}
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Mother's Email</label>
+                                       {{form.mothers_email }}
+                                    </div>
+                                 </div>
+                                 <div class="col-6 col-md-4 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Mother's Mobile</label>
+                                       {{form.mothers_phonenumber }}
+                                    </div>
+                                 </div>
+                           
+                             
+                                 <div class="col-6 col-md-3 col-sm-3">
+                                    <div class="form-group">
+                                       <label>Residential Address</label>
+                                       {{form.residential_address }}
+                                    </div>
+                                 </div>
+                                 <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                 </div>
+                              </div>
+                              
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      
+   </body>
+   {% endblock %}
+   
+</html>

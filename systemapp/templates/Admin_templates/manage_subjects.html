@@ -1,0 +1,89 @@
+{% extends '../base.html' %}
+{% load admin_template_tags %}
+{% load static %}
+
+{% block content %}
+
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+      <div class="page-wrapper">
+        <div class="content container-fluid">
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h3 class="page-title">Subjects</h3>
+                <ul class="breadcrumb">
+                  <li class="breadcrumb-item">
+                    <a href="{% url 'school:add_subject'%}">Add Subject</a>
+                  </li>
+                  <li class="breadcrumb-item active">Subjects</li>
+                </ul>
+              </div>
+              <div class="col-auto text-right float-right ml-auto">
+                <a href="#" class="btn btn-outline-primary mr-2"
+                  ><i class="fas fa-download"></i> Download</a
+                >
+                <a href="{% url 'school:add_subject'%}" class="btn btn-primary"
+                  ><i class="fas fa-plus"></i
+                ></a>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="card card-table">
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table
+                      class="table table-hover table-center mb-0 datatable"
+                    >
+                      <thead>
+                        <tr> 
+                         
+                          <th>Name</th>
+                          <th>Class</th>
+                          <th>No. Students</th>
+                          <th class="text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for subject in subjects %}
+                        <tr>
+                          
+                          <td>
+                            <h6>
+                              <a><span>{{subject.subject_name}}</span></a>
+                            </h3>
+                          </td>
+                          <td><span>{{subject.class_id.name}}</span></td>
+                          <td><span>10</span></td>
+                          <td class="text-right">
+                            <div class="actions">
+                              <a
+                                href="{% url 'school:edit_subject' subject.id %}"
+                                class="btn btn-sm bg-success-light mr-2"
+                              >
+                                <i class="fas fa-pen"></i>
+                              </a>
+                              <a href="#" class="btn btn-sm bg-danger-light">
+                                <i class="fas fa-trash"></i>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                      {% endfor %}
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer>
+          <p>Copyright © 2020 Dreamguys.</p>
+        </footer>
+      </div>
+    </div>
+    {% endblock %}

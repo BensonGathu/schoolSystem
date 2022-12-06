@@ -1,11 +1,119 @@
 from django import forms
 from django.forms import ModelForm
-from .models import  CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
 from django.contrib.auth.forms import UserCreationForm
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from bootstrap_datepicker_plus.widgets import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
+from django.db import transaction
+
+class TeacherSignUpForm(UserCreationForm):
+    first_name = forms.CharField(widget=forms.TextInput(attrs={"class":'form-control my-2', 'placeholder':'Enter firstname','type':'text'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={"class":'form-control my-2', 'placeholder':'Enter lastname','type':'text'}))
+    email = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Enter email','type':'email'}))
+    password1 = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Enter password','type':'password'}))
+    password2 = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Confirm password','type':'password'}))
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ['username', 'first_name', 'last_name',
+                  'email', 'password1', 'password2']
 
 
+
+
+    @transaction.atomic
+    def save(self):
+        user = super().save(commit=False)
+        user.is_teacher = True
+        user.is_staff = True
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
+        user.email = self.cleaned_data.get('email')
+        user.set_password(self.cleaned_data.get('email'))
+        user.save()
+        teacher = Staffs.objects.create(users_type=user)
+        
+        teacher.save()
+        return user
+
+
+class TeacherProfileUpdateForm(forms.ModelForm):
+    national_ID = forms.CharField(widget=forms.TextInput(attrs={"class":'form-control my-2', 'placeholder':'Natioanl ID Number','type':'number'}))
+    address = forms.CharField(widget=forms.TextInput(attrs={"class":'form-control my-2', 'placeholder':'Enter Address','type':'text'}))
+    staff_ID = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Enter Staff ID','type':'text'}))
+    
+    gender_list = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+
+
+
+    gender = forms.ChoiceField(label="Gender",
+                               choices=gender_list,
+                               widget=forms.Select(attrs={"class": "form-control"}))
+    phone = forms.IntegerField(label="phonenumber",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+
+    profile_pic = forms.FileField(label="Profile Pic",
+                                  required=False,
+                                  widget=forms.FileInput(attrs={"class": "form-control"}))
+
+    joined_at = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
+
+
+    class Meta:
+        model = Staffs
+        fields = ['national_ID', 'address', 'staff_ID','gender','phone','profile_pic','joined_at']
+
+class StudentSignUpForm(UserCreationForm):
+    first_name = forms.CharField(max_length=20, required=True)
+    last_name = forms.CharField(max_length=20, required=True)
+    email = forms.EmailField(
+        max_length=60, help_text='Required. Inform a valid email address.')
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ['username', 'first_name', 'last_name',
+                  'email', 'password1', 'password2']
+
+    @transaction.atomic
+    def save(self):
+        user = super().save(commit=False)
+        user.is_student = True
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
+        user.email = self.cleaned_data.get('email')
+        user.save()
+        student = Students.objects.create(user=user)
+        student.save()
+        return user
+
+class AdminSignUpForm(UserCreationForm):
+    first_name = forms.CharField(max_length=20, required=True)
+    last_name = forms.CharField(max_length=20, required=True)
+    email = forms.EmailField(
+        max_length=60, help_text='Required. Inform a valid email address.')
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ['username', 'first_name', 'last_name',
+                  'email', 'password1', 'password2']
+
+    @transaction.atomic
+    def save(self):
+        user = super().save(commit=False)
+        user.is_student = True
+        user.first_name = self.cleaned_data.get('first_name')
+        user.last_name = self.cleaned_data.get('last_name')
+        user.email = self.cleaned_data.get('email')
+        user.save()
+        admin = Admin.objects.create(user=user)
+        admin.save()
+        return user
 
 
 class CreateUserForm(UserCreationForm):
@@ -15,7 +123,7 @@ class CreateUserForm(UserCreationForm):
     password1 = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Enter password','type':'password'}))
     password2 = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control my-2', 'placeholder':'Confirm password','type':'password'}))
     class Meta:
-        model = CustomUser
+        model = User
         fields = ['firstname','lastname','email','password1','password2']
 
 
@@ -32,24 +140,26 @@ class addStaffForm(forms.Form):
                                 max_length=50,
                                 widget=forms.TextInput(attrs={"class": "form-control"}))
                         
-    username = forms.CharField(label="Username",
-                               max_length=50,
-                               widget=forms.TextInput(attrs={"class": "form-control"}))
 
+    joining_date = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
+ 
 
     email = forms.EmailField(label="Email",
                              max_length=50,
                              widget=forms.EmailInput(attrs={"class": "form-control"}))
 
+    phone = forms.IntegerField(label="phonenumber",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
 
-    password = forms.CharField(label="Password",
-                               max_length=50,
-                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
+
 
 
     address = forms.CharField(label="Address",
                               max_length=50,
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
+                              widget=forms.Textarea(attrs={"class": "form-control",'rows':3,'cols':45}))
 
     national_ID = forms.IntegerField(label="national_ID",
                               
@@ -77,7 +187,8 @@ class addStaffForm(forms.Form):
                                   required=False,
                                   widget=forms.FileInput(attrs={"class": "form-control"}))
 
-class editStaffForm(forms.Form):
+
+class addStaffForm(forms.Form):
     first_name = forms.CharField(label="First Name",
                                  max_length=50,
                                  widget=forms.TextInput(attrs={"class": "form-control"}))
@@ -86,28 +197,30 @@ class editStaffForm(forms.Form):
                                 max_length=50,
                                 widget=forms.TextInput(attrs={"class": "form-control"}))
                         
-    username = forms.CharField(label="Username",
-                               max_length=50,
-                               widget=forms.TextInput(attrs={"class": "form-control"}))
 
+    joining_date = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
+ 
 
     email = forms.EmailField(label="Email",
                              max_length=50,
                              widget=forms.EmailInput(attrs={"class": "form-control"}))
 
+    phone = forms.IntegerField(label="phonenumber",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
 
-    password = forms.CharField(label="Password",
-                               max_length=50,
-                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
+
 
 
     address = forms.CharField(label="Address",
                               max_length=50,
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
+                              widget=forms.Textarea(attrs={"class": "form-control",'rows':3,'cols':45}))
 
     national_ID = forms.IntegerField(label="national_ID",
-                             
-                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+                              
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
 
     staff_ID = forms.CharField(label="staff_ID",
                               max_length=50,
@@ -132,7 +245,7 @@ class editStaffForm(forms.Form):
                                   widget=forms.FileInput(attrs={"class": "form-control"}))
 
 
-class AddStudentForm(forms.ModelForm):
+class editStaffForm(forms.Form):
     first_name = forms.CharField(label="First Name",
                                  max_length=50,
                                  widget=forms.TextInput(attrs={"class": "form-control"}))
@@ -141,9 +254,65 @@ class AddStudentForm(forms.ModelForm):
                                 max_length=50,
                                 widget=forms.TextInput(attrs={"class": "form-control"}))
                         
-    username = forms.CharField(label="Username",
-                               max_length=50,
-                               widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    joining_date = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
+ 
+
+    email = forms.EmailField(label="Email",
+                             max_length=50,
+                             widget=forms.EmailInput(attrs={"class": "form-control"}))
+
+    phone = forms.IntegerField(label="phonenumber",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+
+
+
+
+    address = forms.CharField(label="Address",
+                              max_length=50,
+                              widget=forms.Textarea(attrs={"class": "form-control",'rows':3,'cols':45}))
+
+    national_ID = forms.IntegerField(label="national_ID",
+                              
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    staff_ID = forms.CharField(label="staff_ID",
+                              max_length=50,
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    
+
+    gender_list = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+
+
+
+    gender = forms.ChoiceField(label="Gender",
+                               choices=gender_list,
+                               widget=forms.Select(attrs={"class": "form-control"}))
+
+
+    profile_pic = forms.FileField(label="Profile Pic",
+                                  required=False,
+                                  widget=forms.FileInput(attrs={"class": "form-control"}))
+
+
+
+
+class AddStudentForm(forms.Form):
+    first_name = forms.CharField(label="First Name",
+                                 max_length=50,
+                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    last_name = forms.CharField(label="Last Name",
+                                max_length=50,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
+                        
 
 
     email = forms.EmailField(label="Email",
@@ -151,18 +320,18 @@ class AddStudentForm(forms.ModelForm):
                              widget=forms.EmailInput(attrs={"class": "form-control"}))
 
 
-    password = forms.CharField(label="Password",
-                               max_length=50,
-                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
-
-
     address = forms.CharField(label="Address",
                               max_length=50,
                               widget=forms.TextInput(attrs={"class": "form-control"}))
+    admission_date = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
     student_ID = forms.CharField(label="student_ID",
                               max_length=50,
                               widget=forms.TextInput(attrs={"class": "form-control"}))
-
+    student_house = forms.CharField(label="student House",
+                              max_length=50,
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
     fathers_name = forms.CharField(label="fathers_name",
                                 max_length=50,
                                 widget=forms.TextInput(attrs={"class": "form-control"}))
@@ -188,7 +357,143 @@ class AddStudentForm(forms.ModelForm):
     
     residential_address = forms.CharField(label="residential_address",
                                 max_length=50,
+                                widget=forms.Textarea(attrs={"class": "form-control",'rows':3,'cols':40}))
+
+    
+
+
+
+    # For Displaying Classess
+    try:
+        allclasses = Classes.objects.all()
+     
+        classes_list = []
+        for classess in allclasses:
+          
+            single_class = (classess.id, classess.name)
+           
+            classes_list.append(single_class)
+    except:
+       
+        classes_list = []
+
+        
+    # For Displaying Subjects
+    try:
+        subjects = Subjects.objects.all()
+        subject_list = []
+        for subject in subjects:
+            single_subject = (subject.id, subject.subject_name)
+            subject_list.append(single_subject)
+    except:
+      
+        subject_list = []
+
+    # For Displaying Session Years
+    try:
+        session_years = SessionYearModel.objects.all()
+        session_year_list = []
+        for session_year in session_years:
+
+            single_session_year = (session_year.id, str(
+                session_year.session_start_year)+" to "+str(session_year.session_end_year))
+            session_year_list.append(single_session_year)
+       
+
+    except:
+        session_year_list = []
+   
+
+
+
+    gender_list = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+  
+
+    class_id = forms.ChoiceField(label="Classes",
+                                   choices=classes_list,
+                                   widget=forms.Select(attrs={"class": "form-control"}))
+
+    subject_id = forms.MultipleChoiceField(label="Course",
+                                   choices=subject_list,
+                                   widget=forms.SelectMultiple(attrs={"class": "form-control"}))
+
+
+    session_year_id = forms.ChoiceField(label="Session Year",
+                                        choices=session_year_list,
+                                        widget=forms.Select(attrs={"class": "form-control"}))
+
+    gender = forms.ChoiceField(label="Gender",
+                               choices=gender_list,
+                               widget=forms.Select(attrs={"class": "form-control"}))
+
+
+    kcpe_marks = forms.IntegerField(label="kcpe_marks ",
+                                  required=False,
+                                  widget=forms.NumberInput(attrs={"class": "form-control"}))
+
+    profile_pic = forms.FileField(label="Profile Pic",
+                                  required=False,
+                                  widget=forms.FileInput(attrs={"class": "form-control"}))
+
+
+class EditStudentForm(forms.Form):
+
+    first_name = forms.CharField(label="First Name",
+                                 max_length=50,
+                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    last_name = forms.CharField(label="Last Name",
+                                max_length=50,
                                 widget=forms.TextInput(attrs={"class": "form-control"}))
+                        
+
+
+    email = forms.EmailField(label="Email",
+                             max_length=50,
+                             widget=forms.EmailInput(attrs={"class": "form-control"}))
+
+
+    address = forms.CharField(label="Address",
+                              max_length=50,
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
+    admission_date = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
+    student_ID = forms.CharField(label="student_ID",
+                              max_length=50,
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
+    student_house = forms.CharField(label="student House",
+                              max_length=50,
+                              widget=forms.TextInput(attrs={"class": "form-control"}))
+    fathers_name = forms.CharField(label="fathers_name",
+                                max_length=50,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
+    fathers_email = forms.EmailField(label="fathers_email",
+                             max_length=50,
+                             widget=forms.EmailInput(attrs={"class": "form-control"}))
+    
+    fathers_phonenumber = forms.IntegerField(label="fathers_phonenumber",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+    
+    mothers_name = forms.CharField(label="mothers_name",
+                                max_length=50,
+                                widget=forms.TextInput(attrs={"class": "form-control"}))
+    mothers_email = forms.EmailField(label="mothers_email",
+                             max_length=50,
+                             widget=forms.EmailInput(attrs={"class": "form-control"}))
+
+    
+    mothers_phonenumber = forms.IntegerField(label="mothers_phonenumber",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+    
+    residential_address = forms.CharField(label="residential_address",
+                                max_length=50,
+                                widget=forms.Textarea(attrs={"class": "form-control",'rows':3,'cols':40}))
 
     
 
@@ -266,143 +571,6 @@ class AddStudentForm(forms.ModelForm):
     profile_pic = forms.FileField(label="Profile Pic",
                                   required=False,
                                   widget=forms.FileInput(attrs={"class": "form-control"}))
-
-    class Meta:
-        model = Students
-        fields = '__all__'
-
-class EditStudentForm(forms.ModelForm):
-
-    first_name = forms.CharField(label="First Name",
-                                 max_length=50,
-                                 widget=forms.TextInput(attrs={"class": "form-control"}))
-
-    last_name = forms.CharField(label="Last Name",
-                                max_length=50,
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-                        
-    username = forms.CharField(label="Username",
-                               max_length=50,
-                               widget=forms.TextInput(attrs={"class": "form-control"}))
-
-
-    email = forms.EmailField(label="Email",
-                             max_length=50,
-                             widget=forms.EmailInput(attrs={"class": "form-control"}))
-
-
-    password = forms.CharField(label="Password",
-                               max_length=50,
-                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
-
-
-    address = forms.CharField(label="Address",
-                              max_length=50,
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
-    student_ID = forms.CharField(label="student_ID",
-                              max_length=50,
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
-
-    fathers_name = forms.CharField(label="fathers_name",
-                                max_length=50,
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-    fathers_email = forms.EmailField(label="fathers_email",
-                             max_length=50,
-                             widget=forms.EmailInput(attrs={"class": "form-control"}))
-    
-    fathers_phonenumber = forms.IntegerField(label="fathers_phonenumber",
-                             
-                              widget=forms.NumberInput(attrs={"class": "form-control"}))
-    
-    mothers_name = forms.CharField(label="mothers_name",
-                                max_length=50,
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-    mothers_email = forms.EmailField(label="mothers_email",
-                             max_length=50,
-                             widget=forms.EmailInput(attrs={"class": "form-control"}))
-
-    
-    mothers_phonenumber = forms.IntegerField(label="mothers_phonenumber",
-                             
-                              widget=forms.NumberInput(attrs={"class": "form-control"}))
-    
-    residential_address = forms.CharField(label="residential_address",
-                                max_length=50,
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-
-    
-  
-
-
-    # For Displaying Classess
-    try:
-        allclasses = Classes.objects.all()
-       
-        classes_list = []
-        for classess in allclasses:
-           
-            single_class = (classess.id, classess.name)
-          
-            classes_list.append(single_class)
-    except:
-       
-        classes_list = []
-    # For Displaying Subjects
-    try:
-        subjects = Subjects.objects.all()
-        subject_list = []
-        for subject in subjects:
-            single_subject = (subject.id, subject.subject_name)
-            subject_list.append(single_subject)
-    except:
-        
-        subject_list = []
-
-    # For Displaying Session Years
-    try:
-        session_years = SessionYearModel.objects.all()
-        session_year_list = []
-        for session_year in session_years:
-            single_session_year = (session_year.id, str(
-                session_year.session_start_year)+" to "+str(session_year.session_end_year))
-            session_year_list.append(single_session_year)
-
-    except:
-        session_year_list = []
-
-    gender_list = (
-        ('Male', 'Male'),
-        ('Female', 'Female')
-    )
-
-    class_id = forms.ChoiceField(label="Classes",
-                                   choices=classes_list,
-                                   widget=forms.Select(attrs={"class": "form-control"}))
-
-    subject_id = forms.MultipleChoiceField(label="Course",
-                                   choices=subject_list,
-                                   widget=forms.SelectMultiple(attrs={"class": "form-control"}))
-
-
-    session_year_id = forms.ChoiceField(label="Session Year",
-                                        choices=session_year_list,
-                                        widget=forms.Select(attrs={"class": "form-control"}))
-
-    gender = forms.ChoiceField(label="Gender",
-                               choices=gender_list,
-                               widget=forms.Select(attrs={"class": "form-control"}))
-
-
-    kcpe_marks = forms.IntegerField(label="kcpe_marks ",
-                                  required=False,
-                                  widget=forms.NumberInput(attrs={"class": "form-control"}))
-
-    profile_pic = forms.FileField(label="Profile Pic",
-                                  required=False,
-                                  widget=forms.FileInput(attrs={"class": "form-control"}))
-    class Meta:
-        model = Students
-        fields = '__all__'
 
 
 terms = (
@@ -486,14 +654,13 @@ class addClassForm(forms.ModelForm):
                                  widget=forms.Select(attrs={"class": "form-control my-2"})) 
     
     try:
-        teachers = CustomUser.objects.filter(user_type='2')
-        print(teachers)
+        teachers = Staffs.objects.all()
         teachers_list = []
         for teacher in teachers:
-            single_teacher = (teacher.id, teacher.username)
+            single_teacher = (teacher.id, teacher.users_type.username)
             teachers_list.append(single_teacher)
 
-        print("available teachers",teachers_list)
+
         
     except:
         teachers_list = []
@@ -557,7 +724,7 @@ subject_names = (
     ("Agriculture", "Agriculture"),
     ("Business Studies", "Business Studies"),
     )
-class addSubjectForm(forms.Form):
+class addSubjectForm(forms.ModelForm):
     subject_name =   forms.ChoiceField(label="Subjects",
                                    choices=subject_names,widget=forms.Select(attrs={"class": "form-control"}))
 
@@ -565,43 +732,55 @@ class addSubjectForm(forms.Form):
       # For Displaying Classess
     try:
         allclasses = Classes.objects.all()
+     
         classes_list = []
         for classess in allclasses:
-            single_class = (classess.id, classess.name, classess.session)
+          
+            single_class = (classess.id, classess.name)
+           
             classes_list.append(single_class)
     except:
         
         classes_list = []
+    print("subect classes",classes_list)
     class_id = forms.ChoiceField(choices=classes_list,widget=forms.Select(attrs={"class": "form-control"}))
-    try:
-        session_years = SessionYearModel.objects.all()
-        session_year_list = []
-        for session_year in session_years:
-            single_session_year = (session_year.id, str(
-                session_year.session_start_year)+" to "+str(session_year.session_end_year))
-            session_year_list.append(single_session_year)
+    # try:
+    #     session_years = SessionYearModel.objects.all()
+    #     session_year_list = []
+    #     for session_year in session_years:
+    #         single_session_year = (session_year.id, str(
+    #             session_year.session_start_year)+" to "+str(session_year.session_end_year))
+    #         session_year_list.append(single_session_year)
 
-    except:
-        session_year_list = []
-    session_id =   forms.ChoiceField(label="Session",choices=session_year_list,widget=forms.Select(attrs={"class": "form-control"}))
+    # except:
+    #     session_year_list = []
+
+    # print("subect classes",classes_list)
+    # session_id =   forms.ChoiceField(label="Session",choices=session_year_list,widget=forms.Select(attrs={"class": "form-control"}))
 
     try:
-        teachers = CustomUser.objects.filter(users_type=2)
+        teachers = Staffs.objects.all()
         teachers_list = []
         for teacher in teachers:
-            teachers_list.append(teacher)
+            single_teacher = (teacher.id, teacher.users_type.username)
+            teachers_list.append(single_teacher)
         
     except:
         teachers_list = []
+    print("subject trs",teachers_list)
 
     staff_id =  forms.ChoiceField(label="Teacher",
                                    choices=teachers_list
 ,
                                    widget=forms.Select(attrs={"class": "form-control"}))
 
+    class Meta:
+        model = Subjects
+        fields = '__all__'
 
 
-class editSubjectForm(forms.Form):
+
+class editSubjectForm(forms.ModelForm):
     subject_name =   forms.ChoiceField(label="Subjects",
                                    choices=subject_names,widget=forms.Select(attrs={"class": "form-control"}))
 
@@ -609,39 +788,51 @@ class editSubjectForm(forms.Form):
       # For Displaying Classess
     try:
         allclasses = Classes.objects.all()
+     
         classes_list = []
         for classess in allclasses:
-            single_class = (classess.id, classess.name, classess.session)
+          
+            single_class = (classess.id, classess.name)
+           
             classes_list.append(single_class)
     except:
-      
+        
         classes_list = []
+    print("subect classes",classes_list)
     class_id = forms.ChoiceField(choices=classes_list,widget=forms.Select(attrs={"class": "form-control"}))
-    try:
-        session_years = SessionYearModel.objects.all()
-        session_year_list = []
-        for session_year in session_years:
-            single_session_year = (session_year.id, str(
-                session_year.session_start_year)+" to "+str(session_year.session_end_year))
-            session_year_list.append(single_session_year)
+    # try:
+    #     session_years = SessionYearModel.objects.all()
+    #     session_year_list = []
+    #     for session_year in session_years:
+    #         single_session_year = (session_year.id, str(
+    #             session_year.session_start_year)+" to "+str(session_year.session_end_year))
+    #         session_year_list.append(single_session_year)
 
-    except:
-        session_year_list = []
-    session_id =   forms.ChoiceField(label="Session",choices=session_year_list,widget=forms.Select(attrs={"class": "form-control"}))
+    # except:
+    #     session_year_list = []
+
+    # print("subect classes",classes_list)
+    # session_id =   forms.ChoiceField(label="Session",choices=session_year_list,widget=forms.Select(attrs={"class": "form-control"}))
 
     try:
-        teachers = CustomUser.objects.filter(users_type=2)
+        teachers = Staffs.objects.all()
         teachers_list = []
         for teacher in teachers:
-            teachers_list.append(teacher)
+            single_teacher = (teacher.id, teacher.users_type.username)
+            teachers_list.append(single_teacher)
         
     except:
         teachers_list = []
+    print("subject trs",teachers_list)
 
     staff_id =  forms.ChoiceField(label="Teacher",
                                    choices=teachers_list
 ,
                                    widget=forms.Select(attrs={"class": "form-control"}))
+
+    class Meta:
+        model = Subjects
+        fields = '__all__'
 
 
 

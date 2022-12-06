@@ -9,11 +9,10 @@ from django.contrib import messages
 import json
 from .forms import staffApplyLeaveForm,staffUpdateProfileForm
 
-from .models import CustomUser, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
+from .models import User, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
 
 
 def staff_home(request):
-
 	# Fetching All Students under Staff
     print(request.user.id)
     try:
@@ -21,23 +20,23 @@ def staff_home(request):
     except:
         return None
     subjects = Subjects.objects.filter(staff_id=request.user.id)
-    print(subjects)
-    classes_id_list = []
-    for subject in subjects:
-        classes = Classes.objects.get(session=subject.session_id.id)
-        classes_id_list.append(classes.id)
-    
-    final_classes = []
-	# Removing Duplicate Course Id
-    for class_id in classes_id_list:
-        if class_id not in final_classes:
-            final_classes.append(class_id)
+	# classes_id_list = []
+	# for subject in subjects:
+	# 	classes = Classes.objects.filter(sessionperiod_id=subject.class_id.sessionperiod)
+	# 	print(classes)
+	# 	classes_id_list.append(classes)
+     
+    # final_classes = []
+	# # Removing Duplicate Course Id 
+    # for class_id in classes_id_list:
+    #     if class_id not in final_classes:
+    #         final_classes.append(class_id)
 			
-    print(final_classes)
-    students_count = Students.objects.filter(student_class__in=final_classes).count()
-    subject_count = subjects.count()
-    print(subject_count)
-    print(students_count)
+    # print(final_classes)
+    # students_count = Students.objects.filter(student_class__in=final_classes).count()
+    # subject_count = subjects.count()
+    # print(subject_count)
+    # print(students_count)
 	
 	# Fetch All Attendance Count
 	#attendance_count = Attendance.objects.filter(subject_id__in=subjects).count()
@@ -45,7 +44,7 @@ def staff_home(request):
 	# Fetch All Approve Leave
 	# print(request.user)
     # 
-    print(request.user.user_type)
+   
     staff = Staffs.objects.get(users_type=request.user.id)
     leave_count = LeaveReportStaff.objects.filter(staff_id=staff.id,
 												leave_status=1).count()
@@ -72,17 +71,18 @@ def staff_home(request):
 	# 	student_list_attendance_absent.append(attendance_absent_count)
     
     context={
-		"students_count": students_count,
+		# "students_count": students_count,
 		# "attendance_count": attendance_count,
 		"leave_count": leave_count,
-		"subject_count": subject_count,
-		"subject_list": final_classes,
+		"classteacher_to":classteacher_to
+		# "subject_count": subject_count,
+		# "subject_list": final_classes,
 		# "attendance_list": attendance_list,
-		"student_list": students_count,
+		# "student_list": students_count,
 		# "attendance_present_list": student_list_attendance_present,
 		# "attendance_absent_list": student_list_attendance_absent
 	}
-    return render(request, "teacher-dashboard.html", context)
+    return render(request, "Staff_templates/teacher-dashboard.html", context)
 
 
 

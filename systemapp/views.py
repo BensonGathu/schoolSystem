@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect, HttpResponseRedirect
 from django.contrib.auth import logout, authenticate, login
-from .models import CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+from .models import  SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
 from django.contrib import messages
 from .forms import CreateUserForm
 from django.contrib import messages
@@ -20,24 +20,23 @@ def loginUser(request):
 
 
 def loginpage(request):
+    pass
     if request.method == 'POST':
         # email_id = request.POST.get('email')
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
 		
-        print(username)
-        print(password)
-        print(user)
+      
         if user is not None:
             login(request, user)
             messages.success(request, 'Logged in as' + ' ' + username)
             print("logged")
-            if user.user_type == CustomUser.STUDENT:
+            if user.is_student:
                 return redirect('school:student_home')
-            elif user.user_type == CustomUser.STAFF:
+            elif user.is_staff:
                 return redirect('school:staff_home')
-            elif user.user_type == CustomUser.TEACHER:
+            elif user.is_teacher:
                 return redirect('school:staff_home')
            
             elif user.user_type == CustomUser.ADMIN:

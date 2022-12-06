@@ -33,23 +33,42 @@ class SessionYearModel(models.Model):
         unique_together=("school_term", "session_start_year", "session_end_year")
 
 
-class CustomUser(AbstractUser):
-    ADMIN = '1'
-    TEACHER = '2'
-    STAFF = '3'
-    STUDENT = '4'
+# class CustomUser(AbstractUser):
+#     ADMIN = '1'
+#     TEACHER = '2'
+#     STAFF = '3'
+#     STUDENT = '4'
      
-    EMAIL_TO_USER_TYPE_MAP = {
-        'admin': ADMIN,
-        'teacher':TEACHER,
-        'staff': STAFF,
-        'student': STUDENT
-    }
+#     EMAIL_TO_USER_TYPE_MAP = {
+#         'admin': ADMIN,
+#         'teacher':TEACHER,
+#         'staff': STAFF,fst
+#         'student': STUDENT
+#     }
  
-    user_type_data = ((ADMIN, "ADMIN"),(TEACHER, "TEACHER"), (STAFF, "Staff"), (STUDENT, "Student"))
-    user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
+#     user_type_data = ((ADMIN, "ADMIN"),(TEACHER, "TEACHER"), (STAFF, "Staff"), (STUDENT, "Student"))
+#     user_type = models.CharField(default=1, choices=user_type_data, max_length=10)
 
-  
+class User(AbstractUser):
+
+    is_student = models.BooleanField(default=False)
+    is_teacher = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+    first_name = models.CharField(max_length=20, blank=True, null=True)
+    last_name = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(max_length=60, blank=True, null=True)
+
+    class Meta(AbstractUser.Meta):
+        swappable = 'AUTH_USER_MODEL'
+
+    def __str__(self):
+        return self.username
+
+    @classmethod
+    def get_profile(cls, search_profile):
+        profile = cls.objects.filter(first_name__icontains=search_profile)
+        return profile
 genders = (
     ("Male", "Male"),
     ("Female","Female"),
@@ -57,11 +76,11 @@ genders = (
     ) 
 class Admin(models.Model):
     id = models.AutoField(primary_key=True)
-    users_type = models.OneToOneField(CustomUser, on_delete=models.DO_NOTHING, null = True)
+    users_type = models.OneToOneField(User, on_delete=models.DO_NOTHING, null = True)
     national_ID = models.IntegerField(blank=True,null=True)
     staff_ID = models.TextField(blank=True,null=True)
     gender = models.CharField(choices=genders,max_length=100)
-    profile_pic = models.FileField()
+    profile_pic = models.FileField(null=True,blank=True)
     address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -72,12 +91,14 @@ class Admin(models.Model):
 
 class Staffs(models.Model):
     id = models.AutoField(primary_key=True)
-    users_type = models.OneToOneField(CustomUser, on_delete=models.DO_NOTHING, null = True)
+    users_type = models.OneToOneField(User, on_delete=models.DO_NOTHING, null = True)
     address = models.TextField()
-    national_ID = models.IntegerField(blank=True,null=True)
-    staff_ID = models.TextField(blank=True,null=True)
+    national_ID = models.IntegerField()
+    staff_ID = models.CharField(max_length=250)
     gender = models.CharField(choices=genders,max_length=100)
-    profile_pic = models.FileField()
+    profile_pic = models.FileField(blank=True,null=True)
+    phone = models.IntegerField()
+    joined_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -139,7 +160,7 @@ class Classes(models.Model):
     id =models.AutoField(primary_key=True)
     name = models.CharField(choices=class_list,max_length=1000)
     sessionperiod = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING,null = True,blank=True)
-    class_teacher = models.ForeignKey(CustomUser,on_delete=models.DO_NOTHING, null = True)
+    class_teacher = models.ForeignKey(User,on_delete=models.DO_NOTHING, null = True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -157,8 +178,8 @@ class Subjects(models.Model):
      
     # need to give default course
     class_id = models.ForeignKey(Classes,on_delete=models.DO_NOTHING,null=True)
-    session_id = models.ForeignKey(SessionYearModel, on_delete=models.DO_NOTHING, null = True)
-    staff_id = models.ForeignKey(CustomUser,on_delete=models.DO_NOTHING, null = True)
+    # session_id = models.ForeignKey(SessionYearModel, on_delete=models.DO_NOTHING, null = True)
+    staff_id = models.ForeignKey(User,on_delete=models.DO_NOTHING, null = True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
@@ -169,7 +190,7 @@ class Subjects(models.Model):
  
 class Students(models.Model):
     id = models.AutoField(primary_key=True)
-    users_type = models.OneToOneField(CustomUser,on_delete=models.DO_NOTHING, default=1)
+    users_type = models.OneToOneField(User,on_delete=models.DO_NOTHING, default=1)
     gender = models.CharField(choices=genders,max_length=50)
     profile_pic = models.FileField()
     address = models.TextField()
@@ -185,6 +206,7 @@ class Students(models.Model):
     fathers_number = models.IntegerField()
     fathers_email = models.EmailField(max_length=250)
     mothers_name = models.CharField(max_length=250)
+    student_house = models.CharField(max_length=250)
     mothers_number = models.IntegerField()
     mothers_email = models.EmailField(max_length=250)
     residential_address = models.CharField(max_length=250)
@@ -243,39 +265,39 @@ class Exams(models.Model):
     pass
 
 
-@receiver(post_save, sender=CustomUser)
-# Now Creating a Function which will
-# automatically insert data in HOD, Staff or Student
-def create_user_profile(sender, instance, created, **kwargs):
-    # if Created is true (Means Data Inserted)
-    if created:
+# @receiver(post_save, sender=User)
+# # Now Creating a Function which will
+# # automatically insert data in HOD, Staff or Student
+# def create_user_profile(sender, instance, created, **kwargs):
+#     # if Created is true (Means Data Inserted)
+#     if created:
        
-        # Check the user_type and insert the data in respective tables
-        if instance.user_type == 1:
-            Admin.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
-        if instance.user_type == 2:
-            Staffs.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
-        if instance.user_type == 3:
-            Staffs.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
-        if instance.user_type == 4:
-            Students.objects.create(users_type=instance,
-                                    subject_id="",
-                                    session_year_id="",
-                                    student_class="",
-                                    address="",
-                                    student_id="",
-                                    profile_pic="",
-                                    gender="")
+#         # Check the user_type and insert the data in respective tables
+#         if instance.user_type == 1:
+#             Admin.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
+#         if instance.user_type == 2:
+#             Staffs.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
+#         if instance.user_type == 3:
+#             Staffs.objects.create(users_type=instance,national_ID=0,address="",staff_ID="",gender="",profile_pic="")
+#         if instance.user_type == 4:
+#             Students.objects.create(users_type=instance,
+#                                     subject_id="",
+#                                     session_year_id="",
+#                                     student_class="",
+#                                     address="",
+#                                     student_id="",
+#                                     profile_pic="",
+#                                     gender="")
      
  
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
-    if instance.user_type == 1:
-        instance.admin.save()
-    if instance.user_type == 2:
-        instance.staffs.save()
-    if instance.user_type == 3:
-        instance.students.save()
+# @receiver(post_save, sender=CustomUser)
+# def save_user_profile(sender, instance, **kwargs):
+#     if instance.user_type == 1:
+#         instance.admin.save()
+#     if instance.user_type == 2:
+#         instance.staffs.save()
+#     if instance.user_type == 3:
+#         instance.students.save()
 
 
 

@@ -6,21 +6,26 @@ from django.urls import reverse
 import datetime
 from django.contrib import messages
 from .forms import studentUpdateProfileForm 
-from .models import CustomUser, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+from .models import User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+
+
 def student_home(request):
-    student_obj = Students.objects.get(users_type=request.user.id)
+	student_obj = Students.objects.get(users_type=request.user.id)
+	total_subjects  = student_obj.subject_id.count()
     # total_attendance = AttendanceReport.objects.filter(student_id=student_obj).count()
     # attendance_present = AttendanceReport.objects.filter(student_id=student_obj,
     #                                                     status=True).count()
     # attendance_absent = AttendanceReport.objects.filter(student_id=student_obj,
-    #                                                     status=False).count()
-    class_obj = Classes.objects.get(id=student_obj.student_class.id)
-    # total_subjects = Subjects.objects.filter(course_id=class_obj).count()
-    subject_name = []
-    data_present = []
-    data_absent = []
-    subject_data = Subjects.objects.filter(session_id=student_obj.session_year_id)
-    for subject in subject_data:
+    #    
+	#                                                  status=False).count()
+	
+	class_obj = Classes.objects.get(id=student_obj.student_class.id)
+	# total_subjects = Subjects.objects.filter(course_id=class_obj).count()
+	subject_name = []
+	data_present = []
+	data_absent = []
+	subject_data = Subjects.objects.filter(class_id=student_obj.student_class)
+	for subject in subject_data:
         # attendance = Attendance.objects.filter(subject_id=subject.id)
         # attendance_present_count = AttendanceReport.objects.filter(attendance_id__in=attendance,
         #                                                         status=True,
@@ -28,22 +33,24 @@ def student_home(request):
         # attendance_absent_count = AttendanceReport.objects.filter(attendance_id__in=attendance,
         #                                                         status=False,
         #                                                         student_id=student_obj.id).count()
-        subject_name.append(subject.subject_name)
+		subject_name.append(subject.subject_name)
         # data_present.append(attendance_present_count)
         # data_absent.append(attendance_absent_count)
-        
-        context={
-            # "total_attendance": total_attendance,
-            # "attendance_present": attendance_present,
-            # "attendance_absent": attendance_absent,
-            # "total_subjects": total_subjects,
-            "subject_name": subject_name,
-            "data_present": data_present,
-            "data_absent": data_absent
-        }
-        return render(request, "student-dashboard.html")
-
-
+	print(subject_name.count)
+	context={
+		# "total_attendance": total_attendance,
+		# "attendance_present": attendance_present,
+		# "attendance_absent": attendance_absent,
+		# "total_subjects": total_subjects,
+		"subject_name": subject_name,
+		"data_present": data_present,
+		"data_absent": data_absent,
+		"student_obj":student_obj,
+		"total_subjects":total_subjects
+	}
+	return render(request, "Student_templates/student-dashboard.html",context)
+	
+		
 def student_view_attendance(request):
 
 	# Getting Logged in Student Data
@@ -182,42 +189,34 @@ def student_profile(request):
 	return render(request, 'student_template/student_profile.html', context)
 
 
-def student_profile_update(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method!")
-		return redirect('student_profile')
-	else:
-		form = studentUpdateProfileForm(request.POST, request.FILES)
-		if form.is_valid():
 
-			first_name = form.cleaned_data['first_name']
-			last_name = form.cleaned_data['last_name']
-			username = form.cleaned_data['username']
-			email = form.cleaned_data['email']
-			password = form.cleaned_data['password']
-			address = form.cleaned_data['address']
-			profile_pic = form.cleaned_data['profile_pic']
-		try:
-			customuser = CustomUser.objects.get(id=request.user.id)
-			customuser.username = username
-			customuser.first_name = first_name
-			customuser.last_name = last_name
-			customuser.email = email
-		
-			if password != None and password != "":
-				customuser.set_password(password)
-			customuser.save() 
+# def profile(request):
+#     current_user = request.user
+#     if current_user.is_customer:
+#         if request.method == 'POST':
+#             u_form = CustomerUpdateForm(
+#                 request.POST, instance=request.user)
+#             c_form = CustomerProfileUpdateForm(
+#                 request.POST, request.FILES, instance=request.user.customer)
+#             if u_form.is_valid() and c_form.is_valid():
+#                 u_form.save()
+#                 c_form.save()
+#                 messages.success(request, f'Your account has been updated!')
+#                 return redirect('profile')
+#         else:
+#             u_form = CustomerUpdateForm(instance=request.user)
+#             c_form = CustomerProfileUpdateForm(instance=request.user.customer)
 
-			student = Students.objects.get(users_type=customuser.id)
-			student.address = address
-			student.profile_pic = profile_pic
-			student.save()
+  
+
+    # context = {'u_form': u_form,
+    #            'c_form': c_form,
+    #            'current_user': current_user,
+    #            }
+
+    # return render(request, 'profile.html', context)
+
 			
-			messages.success(request, "Profile Updated Successfully")
-			return redirect('student_profile')
-		except:
-			messages.error(request, "Failed to Update Profile")
-			return redirect('student_profile')
 
 
 def student_view_result(request):

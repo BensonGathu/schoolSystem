@@ -32,8 +32,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-AUTH_USER_MODEL = 'systemapp.CustomUser'
+# AUTH_USER_MODEL = 'systemapp.CustomUser'
 
+AUTH_USER_MODEL = 'systemapp.User'
 
 # Application definition
 

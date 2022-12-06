@@ -17,6 +17,7 @@ urlpatterns = [
     path('registration', views.registration, name="registration"),
     path('doLogin', views.loginpage, name="doLogin"),
     path('doRegistration', views.doRegistration, name="doRegistration"),
+    path('newtrRegistration', AdminViews.teacher_registration, name="newtrRegistration"),
      
     # URLS for Student
     path('student_home/', StudentViews.student_home, name="student_home"),
@@ -27,7 +28,7 @@ urlpatterns = [
     path('student_feedback/', StudentViews.student_feedback, name="student_feedback"),
     path('student_feedback_save/', StudentViews.student_feedback_save, name="student_feedback_save"),
     path('student_profile/', StudentViews.student_profile, name="student_profile"),
-    path('student_profile_update/', StudentViews.student_profile_update, name="student_profile_update"),
+    # path('student_profile_update/', StudentViews.student_profile_update, name="student_profile_update"),
     path('student_view_result/', StudentViews.student_view_result, name="student_view_result"),
  
  
@@ -52,10 +53,12 @@ urlpatterns = [
     # URL for Admin
     path('admin_home/', AdminViews.admin_home, name="admin_home"),
     path('add_staff/', AdminViews.add_staff, name="add_staff"),
-    path('add_staff_save/', AdminViews.add_staff_save, name="add_staff_save"),
+ 
     path('manage_staff/', AdminViews.manage_staff, name="manage_staff"),
+    path('manage_teachers/', AdminViews.manage_teacher, name="manage_teachers"),
+    path('teacher_details/<teacher_id>', AdminViews.teacher_view, name="teacher_details"),
     path('edit_staff/<staff_id>/', AdminViews.edit_staff, name="edit_staff"),
-    path('edit_staff_save/', AdminViews.edit_staff_save, name="edit_staff_save"),
+    # path('edit_staff_save/', AdminViews.edit_staff_save, name="edit_staff_save"),
     path('delete_staff/<staff_id>/', AdminViews.delete_staff, name="delete_staff"),
     path('add_class/', AdminViews.add_class, name="add_class"),
     # path('add_class_save/', AdminViews.add_class_save, name="add_class_save"),
@@ -74,14 +77,14 @@ urlpatterns = [
     path('student_details/<student_id>', AdminViews.student_view, name="student_details"),
     # path('add_student_save/', AdminViews.add_student, name="add_student_save"), 
     path('edit_student/<student_id>', AdminViews.edit_student, name="edit_student"),
-    path('edit_student_save/', AdminViews.edit_student_save, name="edit_student_save"),
+    # path('edit_student_save/', AdminViews.edit_student_save, name="edit_student_save"),
     path('manage_student/', AdminViews.manage_student, name="manage_student"),
     path('delete_student/<student_id>/', AdminViews.delete_student, name="delete_student"),
     path('add_subject/', AdminViews.add_subject, name="add_subject"),
-    path('add_subject_save/', AdminViews.add_subject_save, name="add_subject_save"),
+    # path('add_subject_save/', AdminViews.add_subject_save, name="add_subject_save"),
     path('manage_subject/', AdminViews.manage_subject, name="manage_subject"),
     path('edit_subject/<subject_id>/', AdminViews.edit_subject, name="edit_subject"),
-    path('edit_subject_save/', AdminViews.edit_subject_save, name="edit_subject_save"),
+    # path('edit_subject_save/', AdminViews.edit_subject_save, name="edit_subject_save"),
     path('delete_subject/<subject_id>/', AdminViews.delete_subject, name="delete_subject"),
     path('check_email_exist/', AdminViews.check_email_exist, name="check_email_exist"),
     path('check_username_exist/', AdminViews.check_username_exist, name="check_username_exist"),

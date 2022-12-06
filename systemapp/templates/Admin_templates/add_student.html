@@ -40,7 +40,7 @@
                                     <div class="form-group" >
                                        <label>Admission Date</label>
                                        <div>
-                                          <input type="date" id="admission_date" name="admission_date" class="form-control">
+                                          {{form.admission_date}}
                                        </div>
                                     </div>
                                  </div>
@@ -83,7 +83,7 @@
                                  <div class="col-6 col-md-4 col-sm-3">
                                     <div class="form-group">
                                        <label>Student House</label>
-                                       <input type="text" class="form-control">
+                                       {{form.student_house}}
                                     </div>
                                  </div>
                             
@@ -118,38 +118,38 @@
                                  <div class="col-6 col-md-4 col-sm-3">
                                     <div class="form-group">
                                        <label>Father's Name</label>
-                                       <input type="text" id="fathers_name" name="fathers_name"  class="form-control">
+                                       {{form.fathers_name }}
                                     </div>
                                  </div>
                                  <div class="col-6 col-md-4 col-sm-3">
                                     <div class="form-group">
                                        <label>Father's Email</label>
-                                       <input type="email" id="fathers_email" name="fathers_email" class="form-control">
+                                       {{form.fathers_email }}
                                     </div>
                                  </div>
                                  <div class="col-6 col-md-4 col-sm-3">
                                     <div class="form-group">
                                        <label>Father's Mobile</label>
-                                       <input type="text" id="fathers_phonenumber" name="fathers_phonenumber" class="form-control">
+                                       {{form.fathers_phonenumber }}
                                     </div>
                                  </div>
                               
                                  <div class="col-6 col-md-4 col-sm-3">
                                     <div class="form-group">
                                        <label>Mother's Name</label>
-                                       <input type="text" id="mothers_name"  name="mothers_name" class="form-control">
+                                       {{form.mothers_name }}
                                     </div>
                                  </div>
                                  <div class="col-6 col-md-4 col-sm-3">
                                     <div class="form-group">
                                        <label>Mother's Email</label>
-                                       <input type="email" id="mothers_email" name="mothers_email" class="form-control">
+                                       {{form.mothers_email }}
                                     </div>
                                  </div>
                                  <div class="col-6 col-md-4 col-sm-3">
                                     <div class="form-group">
                                        <label>Mother's Mobile</label>
-                                       <input type="text" id="mothers_phonenumber" name="mothers_phonenumber" class="form-control">
+                                       {{form.mothers_phonenumber }}
                                     </div>
                                  </div>
                            
@@ -157,13 +157,14 @@
                                  <div class="col-6 col-md-3 col-sm-3">
                                     <div class="form-group">
                                        <label>Residential Address</label>
-                                       <textarea class="form-control" id="residential_address" name="residential_address"></textarea>
+                                       {{form.residential_address }}
                                     </div>
                                  </div>
                                  <div class="col-12">
                                     <button type="submit" class="btn btn-primary">Submit</button>
                                  </div>
                               </div>
+                              
                            </form>
                         </div>
                      </div>
