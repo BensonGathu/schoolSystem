@@ -41,9 +41,15 @@ def student_count(staffID):
     try:
         all_students = Students.objects.all()
         for student in all_students:
-            single_student = classess.name, classess.sessionperiod.school_term
-            student_list.append(single_class)
-            return student_list.count
+            for subjects in student.subject_id.all():
+                if subjects.staff_id == staffID:
+                    student_list.append(student)
+                   
+            
+        return len(set(student_list))
+
+        
 
     except:
-        return None
+        return 0
+      

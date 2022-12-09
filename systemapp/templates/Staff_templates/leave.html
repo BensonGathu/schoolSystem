@@ -1,0 +1,186 @@
+{%extends '../base.html' %}
+{% load static %}
+{% load teacher_template_tags %}
+
+{% block content %}
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+
+
+
+      <div class="page-wrapper">
+        <div class="content container-fluid">
+          <div class="page-header">
+            <div class="row">
+              <div class="col">
+                <h3 class="page-title">Basic Tables</h3>
+                <ul class="breadcrumb">
+                  <li class="breadcrumb-item">
+                    <a href="index.html">Dashboard</a>
+                  </li>
+                  <li class="breadcrumb-item active">Basic Tables</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+           
+            <div class="col-lg-5">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title"></h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <form method="post" style="justify-content: center;">
+                      {% csrf_token %}
+                     
+                      <div class="row" style="justify-content: center; display: flex;">
+                        <div class="col-12">
+                          <h5 class="form-title"><span>Apply Leave</span></h5>
+                        </div>
+                        <div class="col-12">
+                          <div class="form-group">
+                            <label>Leave Type</label>
+                            {{form.leave_type}}
+                          </div>
+                        </div>
+                        <div class="row" style="padding: 0;margin: 0px;">
+                        <div class="col-6 col-md-6 ">
+                          <div class="form-group">
+                            <label> Start Date</label>
+                            {{form.start_leave_date}}
+                          </div>
+                        </div>
+                        <div class="col-6 col-md-6">
+                          <div class="form-group">
+                            <label> End Date</label>
+                            {{form.end_leave_date}}
+                          </div>
+                        </div>
+                      </div>
+                        <div class="col-12 ">
+                          <div class="form-group">
+                            <label> Message</label>
+                            {{form.leave_message}}
+                          </div>
+                        </div>
+          
+                        <div class="col-12 text-center" >
+                          <button type="submit" class="btn btn-primary " >
+                            Submit
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title">Previous Leave <span></span></h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table mb-0">
+                      <thead>
+                        <tr>
+                          <th>Application Date </th>
+                          <th>Leave Type</th>
+                          <th>Approval/Rejection Date</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for leave in my_leaves %}
+                          {% if leave.leave_status == 0 %}
+                        <tr class="table-primary">
+                          
+                          <td> <span> {{leave.created_at|date:"Y-M-d"}}</span></td>
+                          <td> <span> {{leave.leave_type}} </span></td>
+                          <td> <span> {{leave.updated_at|date:"Y-M-d"}} </span></td>
+                          <td>  <span class="badge badge-primary"> 
+                              Pending
+                          </span></td>
+                        </tr>
+                        {% elif leave.leave_status == 1 %}
+                        <tr class="table-success">
+                          <td> <span> {{leave.created_at|date:"Y-M-d"}}</span></td>
+                          <td> <span> {{leave.leave_type}} </span></td>
+                          <td> <span> {{leave.updated_at|date:"Y-M-d"}} </span></td>
+                          <td>  
+                            <!-- Button trigger modal -->
+                            <span class="badge badge-success" type="button"  data-toggle="modal" data-target="#exampleModalLong"> 
+                            
+                              Approved
+                          </span>
+                        
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle"><b>  <i>{{leave.leave_type}}</i></b></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+        <p>{{leave.leave_message}}</p>
+        <h6> <small><b> Application Date:</b> <i>{{leave.created_at}}</i></small> </h6>
+        <h6> <small><b> period: </b> <i> From {{leave.start_leave_date |date:"Y-M-d" }} to {{leave.end_leave_date|date:"Y-M-d"}}</i></small> </h6>
+    
+        <h6> <small><b> Approval Date: </b> <i>{{leave.updated_at}}</i></small> </h6>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+                        </td>
+                        </tr>
+
+                        {% else %}
+                        <tr class="table-danger">
+                          <td> <span> {{leave.created_at|date:"Y-M-d"}}</span></td>
+                          <td> <span> {{leave.leave_type}} </span></td>
+                          <td> <span> {{leave.updated_at|date:"Y-M-d"}} </span></td>
+                          <td>  <span class="badge badge-danger"> 
+                              Declined
+                          </span></td>
+                        </tr>
+
+                        {% endif %}
+                      </tbody>
+                      {% endfor %}
+                    </table>
+                    <!-- Button trigger modal -->
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+        <footer>
+          <p>Copyright © 2020 Dreamguys.</p>
+        </footer>
+      </div>
+    </div>
+
+
+  </body>
+
+  {% endblock %}

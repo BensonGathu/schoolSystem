@@ -14,7 +14,6 @@ from .models import User, SessionYearModel, StudentResult, Staffs, FeedBackStaff
 
 def staff_home(request):
 	# Fetching All Students under Staff
-    print(request.user.id)
     try:
         classteacher_to = Classes.objects.filter(class_teacher=request.user.id)
     except:
@@ -43,12 +42,16 @@ def staff_home(request):
 	
 	# Fetch All Approve Leave
 	# print(request.user)
-    # 
+    #  
    
-    staff = Staffs.objects.get(users_type=request.user.id)
-    leave_count = LeaveReportStaff.objects.filter(staff_id=staff.id,
-												leave_status=1).count()
+    staff = Staffs.objects.all()
+ 
 
+
+    leave_count = LeaveReportStaff.objects.filter(staff_id=request.user.id,
+                                                  leave_status=1).count()
+    
+	
 	# Fetch Attendance Data by Subjects
 	# subject_list = []
 	# attendance_list = []
@@ -96,41 +99,45 @@ def staff_take_attendance(request):
 	return render(request, "staff_template/take_attendance_template.html", context)
 
 
+
+
+
 def staff_apply_leave(request):
-	print(request.user.id)
 	staff_obj = Staffs.objects.get(users_type=request.user.id)
-	leave_data = LeaveReportStaff.objects.filter(staff_id=staff_obj)
-	context = {
-		"leave_data": leave_data
-	}
-	return render(request, "staff_template/staff_apply_leave_template.html", context)
-
-
-def staff_apply_leave_save(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method")
-		return redirect('staff_apply_leave')
-	else:
+	my_leaves =LeaveReportStaff.objects.filter(staff_id=staff_obj)
+    
+	if request.method == "POST":
 		form = staffApplyLeaveForm(request.POST, request.FILES)
 		if form.is_valid():
+			leave_type = form.cleaned_data['leave_type']
 			start_leave_date = form.cleaned_data['start_leave_date']
 			end_leave_date = form.cleaned_data['end_leave_date']
 			leave_message = form.cleaned_data['leave_message']
 
 			staff_obj = Staffs.objects.get(users_type=request.user.id)
 		try:
-			leave_report = LeaveReportStaff(staff_id=staff_obj,
+			leave_report = LeaveReportStaff.objects.create(staff_id=staff_obj,
+											leave_type=leave_type,
 											start_leave_date=start_leave_date,
 											end_leave_date=end_leave_date,
 											leave_message=leave_message,
 											leave_status=0)
+
+			print("leave report",leave_report)
 			leave_report.save()
 			messages.success(request, "Applied for Leave.")
-			return redirect('staff_apply_leave')
+			return redirect('school:staff_apply_leave')
 		except:
 			messages.error(request, "Failed to Apply Leave")
-			return redirect('staff_apply_leave')
+			return redirect('school:staff_apply_leave')
 
+	form = staffApplyLeaveForm()
+	context = {
+		"my_leaves":my_leaves,
+		"form":form
+	}
+
+	return render(request, "Staff_templates/leave.html",context)
 
 def staff_feedback(request):
     return render(request, "staff_template/staff_feedback_template.html")

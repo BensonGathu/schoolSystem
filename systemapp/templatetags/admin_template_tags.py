@@ -31,3 +31,25 @@ def teacher_class(teacherID):
     for clas in qs:
         return clas.name
   
+
+  #returns the number of students taking a certain subect
+@register.simple_tag
+def student_count(subjectID):
+    student_list = []
+    try:
+        all_students = Students.objects.all()
+        for student in all_students:
+            for subjects in student.subject_id.all():
+                
+                if subjects.id == subjectID:
+                    student_list.append(student)
+                   
+
+        print(student_list)
+        return len(student_list)
+
+        
+
+    except:
+        return 0
+      

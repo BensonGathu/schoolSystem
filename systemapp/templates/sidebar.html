@@ -72,6 +72,20 @@
              </li>
              {% if request.user.is_admin %} 
              <li class="submenu">
+               <a href="#"><i class="fas fa-shield-alt"></i> <span> Human Resource  </span> <span class="menu-arrow"></span></a>
+               <ul>
+                  <li><a href="login.html">Staff Directory</a></li>
+                  <li><a href="register.html">Staff Attendance</a></li>
+                  <li><a href="forgot-password.html">Payroll</a></li>
+                  <li><a href="error-404.html">Apply Leave</a></li>
+                  <li><a href="error-404.html">Leave Type</a></li>
+                  <li><a href="error-404.html">Teachers Ratings</a></li>
+                  <li><a href="error-404.html">Department</a></li>
+                  <li><a href="error-404.html">Designation</a></li>
+                  <li><a href="error-404.html">Disabled Staff</a></li>
+               </ul>
+            </li>
+             <li class="submenu">
                 <a href="#"><i class="fas fa-file-invoice-dollar"></i> <span> Accounts</span> <span class="menu-arrow"></span></a>
                 <ul>
                    <li><a href="fees-collections.html">Fees Collection</a></li>
@@ -83,6 +97,19 @@
                 </ul>
              </li>
              
+             <li class="menu-title">
+               <span>Communication</span>
+            </li>
+            <li class="submenu">
+               <a href="#"><i class="fas fa-shield-alt"></i> <span> Communicate </span> <span class="menu-arrow"></span></a>
+               <ul>
+                  <li><a href="login.html">Notice Board</a></li>
+                  <li><a href="register.html">Send Email</a></li>
+                  <li><a href="forgot-password.html">Send SMS</a></li>
+                  <li><a href="error-404.html">Email/ SMS Log</a></li>
+               </ul>
+            </li>
+           
              <li>
                <a href="{% url 'school:manage_session' %}"><i class="fas fa-holly-berry"></i> <span>School Sessions</span></a>
             </li>
@@ -92,7 +119,9 @@
              </li>
              <li>
                 <a href="fees.html"><i class="fas fa-comment-dollar"></i> <span>Fees</span></a>
-             </li>{% endif %}
+             </li>
+             {% endif %}
+
                 <li>
                 <a href="event.html"><i class="fas fa-calendar-day"></i> <span>Lesson Plan</span></a>
              </li>
@@ -103,10 +132,20 @@
              <li>
                 <a href="time-table.html"><i class="fas fa-table"></i> <span>Time Table</span></a>
              </li>
+             
              <li>
-                <a href="library.html"><i class="fas fa-book"></i> <span>Leave</span></a>
-             </li>
-           
+               {% if request.user.is_teacher %} 
+                <a href="{% url 'school:staff_apply_leave' %}"><i class="fas fa-book"></i> <span>Leave</span></a>
+                
+                {% elif request.user.is_admin %}
+
+                <a href="{% url 'school:staff_leave_view' %}"><i class="fas fa-book"></i> <span>Leave</span></a>
+
+                {% else %}
+
+                {% endif %}
+               </li>
+          
              <li class="menu-title">
                 <span>Pages</span>
              </li>

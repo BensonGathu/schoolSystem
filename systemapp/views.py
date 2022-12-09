@@ -31,19 +31,24 @@ def loginpage(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Logged in as' + ' ' + username)
-            print("logged")
+           
             if user.is_student:
                 return redirect('school:student_home')
+
+            elif user.is_admin and user.is_staff:
+                return redirect("school:admin_home")
+                
             elif user.is_staff:
                 return redirect('school:staff_home')
+           
+                
             elif user.is_teacher:
                 return redirect('school:staff_home')
            
-            elif user.user_type == CustomUser.ADMIN:
-                return redirect("school:admin_home")
+           
         else:
             messages.error(request, 'Invalid Username and/or Password')
-    print("NOt valid")
+
     context = {}
     return render(request, 'auth/login_page.html')
 
@@ -56,7 +61,7 @@ def logoutUser(request):
     messages.info(
         request, 'You have logged out.')  
     # if current_user.is_admin:
-    return redirect('school:home')
+    return redirect('school:doLogin')
     
 
 

@@ -42,7 +42,6 @@ urlpatterns = [
     #path('get_attendance_student/', StaffViews.get_attendance_student, name="get_attendance_student"),
     #path('update_attendance_data/', StaffViews.update_attendance_data, name="update_attendance_data"),
     path('staff_apply_leave/', StaffViews.staff_apply_leave, name="staff_apply_leave"),
-    path('staff_apply_leave_save/', StaffViews.staff_apply_leave_save, name="staff_apply_leave_save"),
     path('staff_feedback/', StaffViews.staff_feedback, name="staff_feedback"),
     path('staff_feedback_save/', StaffViews.staff_feedback_save, name="staff_feedback_save"),
     path('staff_profile/', StaffViews.staff_profile, name="staff_profile"),
@@ -53,7 +52,6 @@ urlpatterns = [
     # URL for Admin
     path('admin_home/', AdminViews.admin_home, name="admin_home"),
     path('add_staff/', AdminViews.add_staff, name="add_staff"),
- 
     path('manage_staff/', AdminViews.manage_staff, name="manage_staff"),
     path('manage_teachers/', AdminViews.manage_teacher, name="manage_teachers"),
     path('teacher_details/<teacher_id>', AdminViews.teacher_view, name="teacher_details"),

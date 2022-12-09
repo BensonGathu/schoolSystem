@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,leave_types
 from django.contrib.auth.forms import UserCreationForm
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from bootstrap_datepicker_plus.widgets import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
@@ -902,12 +902,33 @@ class staffUpdateProfileForm(forms.Form):
                                   widget=forms.FileInput(attrs={"class": "form-control"}))
 
 
+ 
 class staffApplyLeaveForm(forms.Form):
-    start_leave_date = forms.DateField(label="start_leave_date",widget=forms.SelectDateWidget())
-    end_leave_date = forms.DateField(label="end_leave_date",widget=forms.SelectDateWidget())
+    try:
+        leave_types = leave_types.objects.all()
+        leave_type_list = []
+        for leave in leave_types:
+            single_leave = (leave.id, leave.name)
+            leave_type_list.append(single_leave)
+
+       
+        
+    except:
+        teachers_list = []
+
+    leave_type = forms.ChoiceField(label="Leave Type",
+                               choices=leave_type_list,
+                               widget=forms.Select(attrs={"class": "form-control"}))
+    start_leave_date  = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
+    end_leave_date = forms.DateField(
+               widget=forms.TextInput(
+               attrs={'type':'date','class': 'form-control'}))
     leave_message = forms.CharField(label="leave_message",
-                               max_length=500,
-                               widget=forms.PasswordInput(attrs={"class": "form-control"}))
+                              max_length=500,
+                              widget=forms.Textarea(attrs={"class": "form-control",'rows':3,'cols':45}))
+
 
 
 

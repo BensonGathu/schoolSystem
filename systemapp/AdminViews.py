@@ -270,7 +270,7 @@ def add_staff(request):
 				messages.success(request, "Staff Added Successfully!")
 				return redirect('school:add_staff')
 			except:
-				
+				 
 				messages.error(request, "Failed to Add Staff!")
 				return redirect('school:add_staff')
 	else:
@@ -1032,21 +1032,21 @@ def staff_leave_view(request):
 	context = {
 		"leaves": leaves
 	}
-	return render(request, 'admin_templates/staff_leave_view.html', context)
+	return render(request, 'Admin_templates/staff_leave_view.html', context)
 
 
 def staff_leave_approve(request, leave_id):
 	leave = LeaveReportStaff.objects.get(id=leave_id)
 	leave.leave_status = 1
 	leave.save()
-	return redirect('staff_leave_view')
+	return redirect('school:staff_leave_view')
 
 
 def staff_leave_reject(request, leave_id):
 	leave = LeaveReportStaff.objects.get(id=leave_id)
 	leave.leave_status = 2
 	leave.save()
-	return redirect('staff_leave_view')
+	return redirect('school:staff_leave_view')
 
 
 def users_type_view_attendance(request):
