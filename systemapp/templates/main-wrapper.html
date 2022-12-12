@@ -24,15 +24,15 @@
        <ul class="nav user-menu">
           <li class="nav-item dropdown noti-dropdown">
              <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-             <i class="far fa-bell"></i> <span class="badge badge-pill">3</span>
+             <i class="far fa-bell"></i> <span class="badge badge-pill" id="notification-badge"></span>
              </a>
              <div class="dropdown-menu notifications">
                 <div class="topnav-dropdown-header">
                    <span class="notification-title">Notifications</span>
                    <a href="javascript:void(0)" class="clear-noti"> Clear All </a>
                 </div>
-                <div class="noti-content">
-                   <ul class="notification-list">
+                <div class="noti-content" id="notifications-dropdown">
+                   <ul class="notification-list" id="notifications-dropdown">
                       <li class="notification-message">
                          <a href="#">
                             <div class="media">
@@ -46,45 +46,7 @@
                             </div>
                          </a>
                       </li>
-                      <li class="notification-message">
-                         <a href="#">
-                            <div class="media">
-                               <span class="avatar avatar-sm">
-                               <img class="avatar-img rounded-circle" alt="User Image" src="{% static '/img/profiles/avatar-11.jpg' %}">
-                               </span>
-                               <div class="media-body">
-                                  <p class="noti-details"><span class="noti-title">International Software Inc</span> has sent you a invoice in the amount of <span class="noti-title">$218</span></p>
-                                  <p class="noti-time"><span class="notification-time">6 mins ago</span></p>
-                               </div>
-                            </div>
-                         </a>
-                      </li>
-                      <li class="notification-message">
-                         <a href="#">
-                            <div class="media">
-                               <span class="avatar avatar-sm">
-                               <img class="avatar-img rounded-circle" alt="User Image" src="{% static 'img/profiles/avatar-17.jpg' %}">
-                               </span>
-                               <div class="media-body">
-                                  <p class="noti-details"><span class="noti-title">John Hendry</span> sent a cancellation request <span class="noti-title">Apple iPhone XR</span></p>
-                                  <p class="noti-time"><span class="notification-time">8 mins ago</span></p>
-                               </div>
-                            </div>
-                         </a>
-                      </li>
-                      <li class="notification-message">
-                         <a href="#">
-                            <div class="media">
-                               <span class="avatar avatar-sm">
-                               <img class="avatar-img rounded-circle" alt="User Image" src="{% static '/img/profiles/avatar-13.jpg' %}">
-                               </span>
-                               <div class="media-body">
-                                  <p class="noti-details"><span class="noti-title">Mercury Software Inc</span> added a new product <span class="noti-title">Apple MacBook Pro</span></p>
-                                  <p class="noti-time"><span class="notification-time">12 mins ago</span></p>
-                               </div>
-                            </div>
-                         </a>
-                      </li>
+                      
                    </ul> 
                 </div>
                 <div class="topnav-dropdown-footer">
@@ -113,3 +75,40 @@
           </li>
        </ul>
     </div>
+
+    <!-- <script>
+      const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+      const chatSocket = new WebSocket(
+          'ws://'
+          + window.location.host
+          + '/ws/notification/'
+          + roomName
+          + '/'
+      );
+
+      chatSocket.onmessage = function(e) {
+          const data = JSON.parse(e.data);
+          //document.querySelector('#chat-log').value += (data.message + '\n');
+      };
+
+      chatSocket.onclose = function(e) {
+          console.error('Chat socket closed unexpectedly');
+      };
+
+      // document.querySelector('#chat-message-input').focus();
+      // document.querySelector('#chat-message-input').onkeyup = function(e) {
+      //     if (e.keyCode === 13) {  // enter, return
+      //         document.querySelector('#chat-message-submit').click();
+      //     }
+      // };
+
+      // document.querySelector('#chat-message-submit').onclick = function(e) {
+      //     const messageInputDom = document.querySelector('#chat-message-input');
+      //     const message = messageInputDom.value;
+      //     chatSocket.send(JSON.stringify({
+      //         'message': message
+      //     }));
+      //     messageInputDom.value = '';
+      // };
+  </script> -->

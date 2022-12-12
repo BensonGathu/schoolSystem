@@ -16,7 +16,7 @@
       <link rel="stylesheet" href="{% static 'css/style.css' %}">
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
      
-  
+    
       <!-- Font Awesome -->
       <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
   
@@ -39,8 +39,8 @@
       </div>
       {%endfor%}
       {%endif%}
+
   </div>
-  
 
 
    {% block content%}
@@ -58,5 +58,46 @@
 <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
  <!-- Moment.js -->
+
+ <script>
+   const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+   const notificationSocket = new WebSocket(
+       'ws://'
+       + window.location.host
+       + '/ws/notification/'
+       + roomName
+       + '/'
+   );
+
+   notificationSocket.onmessage = function(e) {
+       const data = JSON.parse(e.data);
+       //document.querySelector('#chat-log').value += (data.message + '\n');
+
+       console.log(data);
+       document.getElementById("notifications-dropdown").innerHTML = "<li class='dropdown-item'>" + data + "</li><hr class='dropdown-divider'>" + document.getElementById("notifications-dropdown").innerHTML;
+        document.getElementById("notification-badge").innerHTML = parseInt(document.getElementById("notification-badge").innerHTML) + 1;
+   };
+
+   notificationSocket.onclose = function(e) {
+       console.error('Chat socket closed unexpectedly');
+   };
+
+//    document.querySelector('#chat-message-input').focus();
+//    document.querySelector('#chat-message-input').onkeyup = function(e) {
+//        if (e.keyCode === 13) {  // enter, return
+//            document.querySelector('#chat-message-submit').click();
+//        }
+//    };
+
+//    document.querySelector('#chat-message-submit').onclick = function(e) {
+//        const messageInputDom = document.querySelector('#chat-message-input');
+//        const message = messageInputDom.value;
+//        chatSocket.send(JSON.stringify({
+//            'message': message
+//        }));
+//        messageInputDom.value = '';
+//    };
+</script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
 </html>

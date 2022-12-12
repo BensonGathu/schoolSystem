@@ -76,6 +76,7 @@ def staff_home(request):
     context={
 		# "students_count": students_count,
 		# "attendance_count": attendance_count,
+		"room_name":"broadcast",
 		"leave_count": leave_count,
 		"classteacher_to":classteacher_to
 		# "subject_count": subject_count,

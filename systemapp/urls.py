@@ -11,6 +11,8 @@ app_name = 'school'
 urlpatterns = [ 
     path('admin/', admin.site.urls),
     path('', views.home, name="home"),
+    path('test/', views.test, name="test"),
+
     path('contact', views.contact, name="contact"),
     path('login', views.loginUser, name="login"),
     path('logout_user', views.logoutUser, name="logout_user"),

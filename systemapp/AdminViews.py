@@ -214,6 +214,7 @@ def admin_home(request):
 		# "student_attendance_present_list": student_attendance_present_list,
 		# "student_attendance_leave_list": student_attendance_leave_list,
 		"student_name_list": student_name_list,
+		"room_name":"broadcast",
 	}
 	return render(request, "Admin_templates/admin-dashboard.html", context)
 
@@ -1029,8 +1030,14 @@ def staff_feedback_message_reply(request):
 
 def staff_leave_view(request):
 	leaves = LeaveReportStaff.objects.all()
+	approved_leaves =LeaveReportStaff.objects.filter(leave_status = 1)
+	pending_leaves =LeaveReportStaff.objects.filter(leave_status = 0)
+	rejected_leaves =LeaveReportStaff.objects.filter(leave_status = 2)
 	context = {
-		"leaves": leaves
+		"leaves": leaves,
+		"approved_leaves":approved_leaves,
+		"pending_leaves":pending_leaves,
+		"rejected_leaves":rejected_leaves	
 	}
 	return render(request, 'Admin_templates/staff_leave_view.html', context)
 
