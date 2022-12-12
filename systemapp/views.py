@@ -6,6 +6,21 @@ from .forms import CreateUserForm
 from django.contrib import messages
 # Create your views here.
 
+from channels.layers import get_channel_layer
+
+from asgiref.sync import async_to_sync
+def test(request):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send(
+        "notification_broadcast",
+        {'type':"send_notification",
+        'message':"test notification"}
+    ))
+
+    return HttpResponse("Done")
+
+
+
 
 def home(request):
     return render(request, 'home.html')

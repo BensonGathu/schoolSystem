@@ -46,7 +46,8 @@ def student_home(request):
 		"data_present": data_present,
 		"data_absent": data_absent,
 		"student_obj":student_obj,
-		"total_subjects":total_subjects
+		"total_subjects":total_subjects,
+		"room_name":"broadcast",
 	}
 	return render(request, "Student_templates/student-dashboard.html",context)
 	

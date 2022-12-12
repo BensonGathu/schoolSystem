@@ -1,134 +1,457 @@
-{%extends 'base.html' %}
-{% load static %}
+{%extends 'base.html' %} {% load static %} {% block content %}
+<body>
+  {% include "main-wrapper.html" %} {% include "sidebar.html" %}
 
-
-{% block content %}
-   <body>
-      {% include "main-wrapper.html" %}
-         {% include "sidebar.html" %}
-
-      <div class="page-wrapper">
-        <div class="content container-fluid">
-          <div class="page-header">
-            <div class="row">
-              <div class="col">
-                <h3 class="page-title">Leaves</h3>
-                <ul class="breadcrumb">
-                  <li class="breadcrumb-item">
-                    <a href="index.html">Dashboard</a>
-                  </li>
-                  <li class="breadcrumb-item active">Leaves</li>
-                </ul>
-              </div>
-            </div>
+  <div class="page-wrapper">
+    <div class="content container-fluid">
+      <div class="page-header">
+        <div class="row">
+          <div class="col">
+            <h3 class="page-title">Leaves</h3>
+            <ul class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a href="index.html">Dashboard</a>
+              </li>
+              <li class="breadcrumb-item active">Leaves</li>
+            </ul>
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <!-- <div class="card-header">
+                  <h5 class="card-title">Basic tabs</h5>
+                </div> -->
+            <div class="card-body">
+              <ul class="nav nav-tabs">
+                <li class="nav-item">
+                  <a class="nav-link active" href="#pending" data-toggle="tab"
+                    >Pending <sup><span class="badge badge-secondary">{{pending_leaves.count}}</span></sup>
+                    </a>
+                   
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" 
+                  href="#approved" data-toggle="tab"
+                    >Approved <sup><span class="badge badge-success">{{approved_leaves.count}}</span></sup></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#rejected" data-toggle="tab"
+                    >Rejected <sup><span class="badge badge-danger">{{rejected_leaves.count}}</span></sup></a
+                  >
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane show active" id="pending">
+                  <div class="cad-body">
+                    <div class="table-responsive">
+                      <table class="datatable table table-stripped">
+                        <thead>
+                          <tr>
+                            <th>Applied on</th>
+                            <th>Name</th>
+                            <th>Leave Type</th>
 
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="card">
-                <div class="card-header">
-                
-                  <h5 class="card-title mb-2">Default Datatable</h5>
-                  <p class="card-text">
-                    This is the most basic example of the datatables with zero
-                    configuration. Use the <code>.datatable</code> class to
-                    initialize datatables.
-                  </p>
+                            <th>Start date</th>
+                            <th>End date</th>
+
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for leave in pending_leaves %}
+                          <tr class="table-primary">
+                            <td>{{leave.created_at}}</td>
+                            <td>{{leave.staff_id}}</td>
+                            <td>{{leave.leave_type}}</td>
+                            <td>{{leave.start_leave_date |date:"Y-M-d"}}</td>
+                            <td>{{leave.end_leave_date|date:"Y-M-d"}}</td>
+
+                            <td>
+                              <div class="actions">
+                                <!-- <a
+                                      href="{% url 'school:staff_leave_approve' leave.id %}"
+                                      class="btn btn-sm badge badge-success" style="color: rgb(236, 236, 236);"
+                                    >
+                                      Approve
+                                    </a>
+
+                                    <a href="{% url 'school:staff_leave_reject' leave.id %}" class="btn btn-sm badge badge-danger" style="color: rgb(255, 255, 255);">
+                                      Decline
+                                    </a> -->
+
+                                <!-- Button trigger modal -->
+                                <button
+                                  type="button"
+                                  class="btn"
+                                  data-toggle="modal"
+                                  data-target="#exampleModalLong{{leave.id}}"
+                                >
+                                  <i class="fa fa-eye"></i>
+                                </button>
+
+                                <!-- Modal -->
+                                <div
+                                  class="modal fade"
+                                  id="exampleModalLong{{leave.id}}"
+                                  tabindex="-1"
+                                  role="dialog"
+                                  aria-labelledby="exampleModalLongTitle"
+                                  aria-hidden="true"
+                                >
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h6
+                                          class="modal-title"
+                                          id="exampleModalLongTitle"
+                                        >
+                                          <b
+                                            >{{leave.staff_id}} Leave
+                                            Application<br /><i
+                                              >{{leave.leave_type}}</i
+                                            ></b
+                                          >
+                                        </h6>
+                                        <button
+                                          type="button"
+                                          class="close"
+                                          data-dismiss="modal"
+                                          aria-label="Close"
+                                        >
+                                          <span aria-hidden="true"
+                                            >&times;</span
+                                          >
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <p>{{leave.leave_message}}</p>
+
+                                        <h6>
+                                          <small
+                                            ><b> period: </b>
+                                            <i>
+                                              From {{leave.start_leave_date|date:"Y-M-d" }} to
+                                              {{leave.end_leave_date|date:"Y-M-d"}}</i
+                                            ></small
+                                          >
+                                        </h6>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button
+                                          type="button"
+                                          class="btn btn-sm badge badge-secondary"
+                                          data-dismiss="modal"
+                                        >
+                                          Close
+                                        </button>
+                                        <a
+                                          href="{% url 'school:staff_leave_approve' leave.id %}"
+                                          class="btn btn-sm badge badge-success"
+                                          style="color: rgb(236, 236, 236)"
+                                        >
+                                          Approve
+                                        </a>
+                                        <a
+                                          href="{% url 'school:staff_leave_reject' leave.id %}"
+                                          class="btn btn-sm badge badge-danger"
+                                          style="color: rgb(255, 255, 255)"
+                                        >
+                                          Decline
+                                        </a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="datatable table table-stripped">
-                      <thead>
-                        <tr>
-                          <th>Application Date</th>
-                          <th>Name</th>
-                          <th>Leave Type</th>
-                          
-                          <th>Start date</th>
-                          <th>End date</th>
-                          
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {% for leave in leaves %}
-                        <tr>
-                          <td>{{leave.created_at}}</td>
-                          <td>{{leave.staff_id}}</td>
-                          <td>{{leave.leave_type}}</td>
-                          <td>{{leave.start_leave_date |date:"Y-M-d"}}</td>
-                          <td>{{leave.end_leave_date|date:"Y-M-d"}}</td>
-                        
-                          <td >
-                            <div class="actions">
-                              <!-- <a
-                                href="{% url 'school:staff_leave_approve' leave.id %}"
-                                class="btn btn-sm badge badge-success" style="color: rgb(236, 236, 236);"
-                              >
-                                Approve
-                              </a>
-                              <a href="{% url 'school:staff_leave_reject' leave.id %}" class="btn btn-sm badge badge-danger" style="color: rgb(255, 255, 255);">
-                                Decline
-                              </a> -->
-                            
-                            <!-- Button trigger modal -->
-<button type="button" class="btn " data-toggle="modal" data-target="#exampleModalLong">
-  <i class="fa fa-eye" ></i>
-</button>
+                <div class="tab-pane" id="approved">
+                  <div class="cad-body">
+                    <div class="table-responsive">
+                      <table class="datatable table table-stripped">
+                        <thead>
+                          <tr>
+                            <th>Applied on</th>
+                            <th>Name</th>
+                            <th>Leave Type</th>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h6 class="modal-title" id="exampleModalLongTitle"> <b>{{leave.staff_id}} Leave Application<br><i>{{leave.leave_type}}</i></b></h6>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-       
-        <p>{{leave.leave_message}}</p>
+                            <th>Start date</th>
+                            <th>End date</th>
 
-        <h6> <small><b> period: </b> <i> From {{leave.start_leave_date |date:"Y-M-d" }} to {{leave.end_leave_date|date:"Y-M-d"}}</i></small> </h6>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-sm  badge badge-secondary" data-dismiss="modal">Close</button>
-        <a
-        href="{% url 'school:staff_leave_approve' leave.id %}"
-        class="btn btn-sm badge badge-success" style="color: rgb(236, 236, 236);"
-      >
-        Approve
-      </a>
-        <a href="{% url 'school:staff_leave_reject' leave.id %}" class="btn btn-sm badge badge-danger" style="color: rgb(255, 255, 255);">
-          Decline
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-                             
-                            </div>
-                          </td>
-                        </tr>
-                        {% endfor %}
-                      </tbody>
-                    </table>
-                    
+                            <th>Approved on</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for leave in approved_leaves %}
+                          <tr  class="table-success"
+                          
+                          data-toggle="modal"
+                          data-target="#exampleModalLong{{leave.id}}"
+                          >
+                            <td>{{leave.created_at}}</td>
+                            <td>{{leave.staff_id}}</td>
+                            <td>{{leave.leave_type}}</td>
+                            <td>{{leave.start_leave_date |date:"Y-M-d"}}</td>
+                            <td>{{leave.end_leave_date|date:"Y-M-d"}}</td>
+
+                            <td>
+                              <div class="actions">
+                                <span>{{leave.updated_at|date:"Y-M-d"}}</span>
+                                <!-- <a
+                                    href="{% url 'school:staff_leave_approve' leave.id %}"
+                                    class="btn btn-sm badge badge-success" style="color: rgb(236, 236, 236);"
+                                  >
+                                    Approve
+                                  </a>
+                                  <a href="{% url 'school:staff_leave_reject' leave.id %}" class="btn btn-sm badge badge-danger" style="color: rgb(255, 255, 255);">
+                                    Decline
+                                  </a> -->
+
+                                <!-- Button trigger modal -->
+                                <!-- <button
+                                  type="button"
+                                  class="btn"
+                                  data-toggle="modal"
+                                  data-target="#exampleModalLong"
+                                >
+                                  <i class="fa fa-eye"></i>
+                                </button> -->
+
+                                <!-- Modal -->
+                                <div
+                                  class="modal fade"
+                                  id="exampleModalLong{{leave.id}}"
+                                  tabindex="-1"
+                                  role="dialog"
+                                  aria-labelledby="exampleModalLongTitle"
+                                  aria-hidden="true"
+                                >
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h6
+                                          class="modal-title"
+                                          id="exampleModalLongTitle"
+                                        >
+                                          <b
+                                            >{{leave.staff_id}} Leave
+                                            Application<br /><i
+                                              >{{leave.leave_type}}</i
+                                            ></b
+                                          >
+                                        </h6>
+                                        <button
+                                          type="button"
+                                          class="close"
+                                          data-dismiss="modal"
+                                          aria-label="Close"
+                                        >
+                                          <span aria-hidden="true"
+                                            >&times;</span
+                                          >
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <p>{{leave.leave_message}}</p>
+
+                                        <h6>
+                                          <small
+                                            ><b> period: </b>
+                                            <i>
+                                              From {{leave.start_leave_date|date:"Y-M-d" }} to
+                                              {{leave.end_leave_date|date:"Y-M-d"}}</i
+                                            ></small
+                                          >
+                                        </h6>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button
+                                          type="button"
+                                          class="btn btn-sm badge badge-secondary"
+                                          data-dismiss="modal"
+                                        >
+                                          Close
+                                        </button>
+                                        <a
+                                          href="{% url 'school:staff_leave_approve' leave.id %}"
+                                          class="btn btn-sm badge badge-success"
+                                          style="color: rgb(236, 236, 236)"
+                                        >
+                                          Approve
+                                        </a>
+                                        <a
+                                          href="{% url 'school:staff_leave_reject' leave.id %}"
+                                          class="btn btn-sm badge badge-danger"
+                                          style="color: rgb(255, 255, 255)"
+                                        >
+                                          Decline
+                                        </a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane" id="rejected">
+                  <div class="car-body">
+                    <div class="table-responsive">
+                      <table class="datatable table table-stripped">
+                        <thead>
+                          <tr>
+                            <th>Applied on</th>
+                            <th>Name</th>
+                            <th>Leave Type</th>
+
+                            <th>Start date</th>
+                            <th>End date</th>
+
+                            <th>Rejected on</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for leave in rejected_leaves %}
+                          <tr class="table-danger"  
+                       
+                          data-toggle="modal"
+                          data-target="#exampleModalLong{{leave.id}}" >
+                            <td>{{leave.created_at}}</td>
+                            <td>{{leave.staff_id}}</td>
+                            <td>{{leave.leave_type}}</td>
+                            <td>{{leave.start_leave_date |date:"Y-M-d"}}</td>
+                            <td>{{leave.end_leave_date|date:"Y-M-d"}}</td>
+
+                            <td>
+                              <div class="actions">
+                                <span>{{leave.updated_at|date:"Y-M-d"}}</span>
+                                <!-- <a
+                                    href="{% url 'school:staff_leave_approve' leave.id %}"
+                                    class="btn btn-sm badge badge-success" style="color: rgb(236, 236, 236);"
+                                  >
+                                    Approve
+                                  </a>
+                                  <a href="{% url 'school:staff_leave_reject' leave.id %}" class="btn btn-sm badge badge-danger" style="color: rgb(255, 255, 255);">
+                                    Decline
+                                  </a> -->
+
+                                <!-- Button trigger modal -->
+                                <!-- <button
+                                  type="button"
+                                  class="btn"
+                                  data-toggle="modal"
+                                  data-target="#exampleModalLong"
+                                >
+                                  <i class="fa fa-eye"></i>
+                                </button> -->
+
+                                <!-- Modal -->
+                                <div
+                                  class="modal fade"
+                                  id="exampleModalLong{{leave.id}}"
+                                  tabindex="-1"
+                                  role="dialog"
+                                  aria-labelledby="exampleModalLongTitle"
+                                  aria-hidden="true"
+                                >
+                                  <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h6
+                                          class="modal-title"
+                                          id="exampleModalLongTitle"
+                                        >
+                                          <b
+                                            >{{leave.staff_id}} Leave
+                                            Application<br /><i
+                                              >{{leave.leave_type}}</i
+                                            ></b
+                                          >
+                                        </h6>
+                                        <button
+                                          type="button"
+                                          class="close"
+                                          data-dismiss="modal"
+                                          aria-label="Close"
+                                        >
+                                          <span aria-hidden="true"
+                                            >&times;</span
+                                          >
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <p>{{leave.leave_message}}</p>
+
+                                        <h6>
+                                          <small
+                                            ><b> period: </b>
+                                            <i>
+                                              From {{leave.start_leave_date|date:"Y-M-d" }} to
+                                              {{leave.end_leave_date|date:"Y-M-d"}}</i
+                                            ></small
+                                          >
+                                        </h6>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button
+                                          type="button"
+                                          class="btn btn-sm badge badge-secondary"
+                                          data-dismiss="modal"
+                                        >
+                                          Close
+                                        </button>
+                                        <a
+                                          href="{% url 'school:staff_leave_approve' leave.id %}"
+                                          class="btn btn-sm badge badge-success"
+                                          style="color: rgb(236, 236, 236)"
+                                        >
+                                          Approve
+                                        </a>
+                                        <a
+                                          href="{% url 'school:staff_leave_reject' leave.id %}"
+                                          class="btn btn-sm badge badge-danger"
+                                          style="color: rgb(255, 255, 255)"
+                                        >
+                                          Decline
+                                        </a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <footer>
-          <p>Copyright © 2020 Dreamguys.</p>
-        </footer>
+       
       </div>
+
+      <footer>
+        <p>Copyright © 2020 Dreamguys.</p>
+      </footer>
     </div>
+  </div>
+</body>
 
-  
-  </body>
-
-  {% endblock %}
+{% endblock %}

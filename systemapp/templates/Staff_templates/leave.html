@@ -14,12 +14,12 @@
           <div class="page-header">
             <div class="row">
               <div class="col">
-                <h3 class="page-title">Basic Tables</h3>
+                <h3 class="page-title">Leaves</h3>
                 <ul class="breadcrumb">
                   <li class="breadcrumb-item">
                     <a href="index.html">Dashboard</a>
                   </li>
-                  <li class="breadcrumb-item active">Basic Tables</li>
+                  <li class="breadcrumb-item active">Leave</li>
                 </ul>
               </div>
             </div>
@@ -83,7 +83,7 @@
             <div class="col-lg-7">
               <div class="card">
                 <div class="card-header">
-                  <h5 class="card-title">Previous Leave <span></span></h5>
+                  <h5 class="card-title">Leave History<span></span></h5>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">
@@ -104,9 +104,34 @@
                           <td> <span> {{leave.created_at|date:"Y-M-d"}}</span></td>
                           <td> <span> {{leave.leave_type}} </span></td>
                           <td> <span> {{leave.updated_at|date:"Y-M-d"}} </span></td>
-                          <td>  <span class="badge badge-primary"> 
+                          <td>  <span class="badge badge-primary" type="button"  data-toggle="modal" data-target="#exampleModalLong{{leave.id}}"> 
                               Pending
-                          </span></td>
+                          </span>
+                        <!-- Modal -->
+<div class="modal fade" id="exampleModalLong{{leave.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle"><b>  <i>{{leave.leave_type}}</i></b></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+        <p>{{leave.leave_message}}</p>
+        <h6> <small><b> Application Date:</b> <i>{{leave.created_at}}</i></small> </h6>
+        <h6> <small><b> period: </b> <i> From {{leave.start_leave_date |date:"Y-M-d" }} to {{leave.end_leave_date|date:"Y-M-d"}}</i></small> </h6>
+    
+        <h6> <small><b> Status: </b> <i>Pending</i></small> </h6>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+                        </td>
                         </tr>
                         {% elif leave.leave_status == 1 %}
                         <tr class="table-success">
@@ -115,7 +140,7 @@
                           <td> <span> {{leave.updated_at|date:"Y-M-d"}} </span></td>
                           <td>  
                             <!-- Button trigger modal -->
-                            <span class="badge badge-success" type="button"  data-toggle="modal" data-target="#exampleModalLong"> 
+                            <span class="badge badge-success" type="button"  data-toggle="modal" data-target="#exampleModalLong{{leave.id}}"> 
                             
                               Approved
                           </span>
@@ -123,7 +148,7 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+<div class="modal fade" id="exampleModalLong{{leave.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -142,7 +167,6 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
@@ -155,9 +179,35 @@
                           <td> <span> {{leave.created_at|date:"Y-M-d"}}</span></td>
                           <td> <span> {{leave.leave_type}} </span></td>
                           <td> <span> {{leave.updated_at|date:"Y-M-d"}} </span></td>
-                          <td>  <span class="badge badge-danger"> 
+                          <td>  <span class="badge badge-danger" type="button"  data-toggle="modal" data-target="#exampleModalLong{{leave.id}}">
+                             
                               Declined
-                          </span></td>
+                          </span>
+                        
+                        <!-- Modal -->
+<div class="modal fade" id="exampleModalLong{{leave.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle"><b>  <i>{{leave.leave_type}}</i></b></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+        <p>{{leave.leave_message}}</p>
+        <h6> <small><b> Application Date:</b> <i>{{leave.created_at}}</i></small> </h6>
+        <h6> <small><b> period: </b> <i> From {{leave.start_leave_date |date:"Y-M-d" }} to {{leave.end_leave_date|date:"Y-M-d"}}</i></small> </h6>
+    
+        <h6> <small><b> Rejected on: </b> <i>{{leave.updated_at}}</i></small> </h6>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div></td>
                         </tr>
 
                         {% endif %}
