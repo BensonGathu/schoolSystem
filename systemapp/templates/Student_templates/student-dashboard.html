@@ -13,11 +13,21 @@
             <div class="row">
               <div class="col-sm-12">
                 <h3 class="page-title">Welcome {{student_obj.users_type.first_name}} {{student_obj.users_type.last_name}}!</h3>
-                <ul class="breadcrumb">
-                  <li class="breadcrumb-item">
-                    <a href="#">Dashboard</a>
-                  </li>
-                  <li class="breadcrumb-item active">Student Dashboard</li>
+                <div class="row">
+                  <div class="col-lg-5">
+                <ul class="breadcrumb ">
+                 
+                      <li class="breadcrumb-item ">
+                      <a href="#">Dashboard</a>
+                    </li>
+                    <li class="breadcrumb-item active">Student Dashboard</li>
+                  </div>
+                    <div class="col-lg-7"> 
+                    
+                     <li class="breadcrumb-item active"><b> Current class: </b> {{student_obj.student_class}}</li>
+                  </div>
+                  </div>
+               
                 </ul>
               </div>
             </div>
