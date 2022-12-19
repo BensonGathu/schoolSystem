@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.contrib import messages
@@ -12,6 +12,7 @@ from .forms import staffApplyLeaveForm,staffUpdateProfileForm,addResultsForm
 from .models import User, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
 
 
+	
 def staff_home(request):
 	# Fetching All Students under Staff
     try:
@@ -391,7 +392,7 @@ def staff_add_result(request):
 def staff_students(request,subject_id):
 	current_subject = get_object_or_404(Subjects,id=subject_id)
 	students = []
-
+	request.session['current_subject_id'] = subject_id
 	all_students =  Students.objects.all()
 	for student in all_students:
 		for subject in student.subject_id.all():
@@ -419,41 +420,65 @@ def staff_students_all(request):
 	return render(request, 'Staff_templates/all_students.html', context)
 
 
-def staff_add_marks(request,studentID,subjectID):
-	student_obj = get_object_or_404(Students,id=studentID)
+def staff_add_marks(request,student_id):
+	subjectID = request.session.get('current_subject_id')
+	student_obj = get_object_or_404(Students,id=student_id)
 	subject_obj =get_object_or_404(Subjects,id=subjectID)
-	form = addResultsForm()
-	if request.method == "POST":
-		form = addResultsForm(request.POST)
-		if form.is_valid():
-			marks = form.save(commit=False)
-			marks.student = student_obj
-			marks.subjects = subject_obj
-			
-			marks.teacher = request.user.username
-			marks.save()
-
-		try:
-			# Check if Students Result Already Exists or not
-			check_exist = StudentResult.objects.filter(subject_id=subject_obj,
+	staff_obj = get_object_or_404(Staffs,users_type=request.user.id)
+	check_exist = StudentResult.objects.filter(subject_id=subject_obj,
 													student_id=student_obj).exists()
-			if check_exist:
-				result = StudentResult.objects.get(subject_id=subject_obj,
-												student_id=student_obj)
-				result.subject_assignment_marks = assignment_marks
-				result.subject_exam_marks = exam_marks
-				result.save()
-				messages.success(request, "Result Updated Successfully!")
-				return redirect('staff_add_result')
-			else:
-				result = StudentResult(student_id=student_obj,
-									subject_id=subject_obj,
-									subject_exam_marks=exam_marks,
-									subject_assignment_marks=assignment_marks)
-				result.save()
-				messages.success(request, "Result Added Successfully!")
-				return redirect('staff_add_result')
-		except:
-			messages.error(request, "Failed to Add Result!")
-			return redirect('staff_add_result')
 
+	if not check_exist:
+	
+		form  = addResultsForm(request.POST, request.FILES)
+		if request.method == "POST":
+			if form.is_valid():
+					marks = form.save(commit=False)
+					marks.student_id = student_obj
+					marks.subject_id = subject_obj
+					
+					marks.staff_id = staff_obj
+					marks.save()
+					return redirect('school:staff_students', subjectID) 
+			
+		form = addResultsForm()
+		context = {
+					"form":form
+				}
+
+		return render(request, 'Staff_templates/marks.html', context)
+
+def staff_edit_marks(request,student_id):
+	subjectID = request.session.get('current_subject_id')
+	student_obj = get_object_or_404(Students,id=student_id)
+	subject_obj =get_object_or_404(Subjects,id=subjectID)
+	staff_obj = get_object_or_404(Staffs,users_type=request.user.id)
+	check_exist = StudentResult.objects.filter(subject_id=subject_obj,
+													student_id=student_obj).exists()
+	
+	if check_exist:
+		result = StudentResult.objects.get(subject_id=subject_obj,
+											student_id=student_obj)
+
+		form = addResultsForm(request.POST, request.FILES, instance=result)
+		if request.method == "POST":
+			if form.is_valid():
+					marks = form.save(commit=False)
+					marks.student_id = student_obj
+					marks.subject_id = subject_obj
+					
+					marks.staff_id = staff_obj
+					marks.save()
+					return redirect('school:staff_students', subjectID) 
+			context = {
+					"form":form,
+					"subjectID":subjectID
+				}
+			return render(request, 'Staff_templates/marks.html', context)
+			
+		form = addResultsForm(instance=result)
+		context = {
+					"form":form
+				}
+
+		return render(request, 'Staff_templates/marks.html', context)

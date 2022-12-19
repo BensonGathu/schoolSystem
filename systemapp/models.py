@@ -230,9 +230,10 @@ class StudentResult(models.Model):
     id = models.AutoField(primary_key=True)
     student_id = models.ForeignKey(Students, on_delete=models.DO_NOTHING,null=True)
     subject_id = models.ForeignKey(Subjects, on_delete=models.DO_NOTHING, null=True)
-    subject_exam1_marks = models.FloatField(validators=[MaxValueValidator(30),MinValueValidator(0)],default=0)
-    subject_exam2_marks = models.FloatField(validators=[MaxValueValidator(30),MinValueValidator(0)],default=0)
-    subject_endexam_marks = models.FloatField(validators=[MaxValueValidator(70),MinValueValidator(0)],default=0)
+    staff_id = models.ForeignKey(Staffs, on_delete=models.DO_NOTHING, null=True)
+    subject_exam1_marks = models.FloatField(validators=[MaxValueValidator(30),MinValueValidator(0)],default=0,null=True,blank=True)
+    subject_exam2_marks = models.FloatField(validators=[MaxValueValidator(30),MinValueValidator(0)],default=0,null=True,blank=True)
+    subject_endexam_marks = models.FloatField(validators=[MaxValueValidator(70),MinValueValidator(0)],default=0,null=True,blank=True)
  
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

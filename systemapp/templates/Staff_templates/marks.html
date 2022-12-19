@@ -1,0 +1,73 @@
+{% extends '../base.html' %}
+{% load admin_template_tags %}
+{% load static %}
+
+{% block content %}
+
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+      <div class="page-wrapper">
+        <div class="content container-fluid">
+          <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col">
+                <h3 class="page-title"> Marks</h3>
+                <ul class="breadcrumb">
+                  <li class="breadcrumb-item">
+                    <a href="#">Students</a>
+                  </li>
+                  <li class="breadcrumb-item active">Add Marks</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="card">
+                <div class="card-body">
+                  <form method="post">
+                    {% csrf_token %}
+                        <div class="row">
+                            <div class="col-6 col-md-3 col-sm-3">
+                                <div class="form-group" >
+                                   <label>Cat One</label>
+                                   <div aria-placeholder="Cat One">
+                                     {{form.subject_exam1_marks}}
+                                   </div>
+                                </div>
+                               
+                            </div>
+                        <div class="col-6 col-md-3 col-sm-3 form-group">
+                            <label>Cat Two</label>
+                            <div aria-placeholder="Cat Two">
+                               {{ form.subject_exam2_marks }}
+                             </div>  
+                        </div>
+
+                        <div class="col-6 col-md-3 col-sm-3 form-group">
+                            <label>End Term</label>
+                            <div aria-placeholder="End Term">
+                                {{form.subject_endexam_marks}}
+                           
+                              </div>
+                        </div>
+
+                
+                         <div class="col-6 col-md-3 col-sm-3 form-group p-4 my-2" >
+                            <button type="submit" class="btn btn-primary">Add</button>
+                         </div>
+                        </div>
+                        
+                  
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% endblock %}

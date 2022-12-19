@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'systemapp',
     "bootstrap_datepicker_plus",
+    'bootstrap_modal_forms',
+
     
     'notifications'
 ]
