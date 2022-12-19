@@ -28,7 +28,7 @@
                </ul>
 
 
-                {% endif %}
+                {% endif %} 
               
              </li>
              {% if request.user.is_admin %} 
@@ -70,6 +70,18 @@
              <li class="menu-title">
                 <span>Management</span>
              </li>
+             {% if request.user.is_student %} 
+
+             <li>
+               <a href="#"><i class="fas fa-holly-berry"></i> <span>Exam Results</span></a>
+            </li>
+            <li>
+               <a href="#"><i class="fas fa-holly-berry"></i> <span>Reports</span></a>
+            </li>
+            <li>
+               <a href="#"><i class="fas fa-holly-berry"></i> <span>Fees</span></a>
+            </li>
+            {% endif %}
              {% if request.user.is_admin %} 
              <li class="submenu">
                <a href="#"><i class="fas fa-shield-alt"></i> <span> Human Resource  </span> <span class="menu-arrow"></span></a>
@@ -96,7 +108,7 @@
                    <li><a href="add-salary.html">Add Salary</a></li>
                 </ul>
              </li>
-             
+             {% if request.user.is_teacher %} 
              <li class="menu-title">
                <span>Communication</span>
             </li>
@@ -109,7 +121,7 @@
                   <li><a href="error-404.html">Email/ SMS Log</a></li>
                </ul>
             </li>
-           
+           {% endif %}
              <li>
                <a href="{% url 'school:manage_session' %}"><i class="fas fa-holly-berry"></i> <span>School Sessions</span></a>
             </li>
@@ -122,11 +134,12 @@
              </li>
              {% endif %}
 
+             {% if request.user.is_teacher %} 
                 <li>
                 <a href="event.html"><i class="fas fa-calendar-day"></i> <span>Lesson Plan</span></a>
              </li>
              <li>
-                <a href="exam.html"><i class="fas fa-clipboard-list"></i> <span>Exam</span></a>
+                <a href="{% url 'school:staff_add_result' %}"><i class="fas fa-clipboard-list"></i> <span>Exam</span></a>
              </li>
           
              <li>
@@ -134,17 +147,19 @@
              </li>
              
              <li>
-               {% if request.user.is_teacher %} 
-                <a href="{% url 'school:staff_apply_leave' %}"><i class="fas fa-book"></i> <span>Leave</span></a>
-                
+              
+            <a href="{% url 'school:staff_apply_leave' %}"><i class="fas fa-book"></i> <span>Leave</span></a>
+         </li>
+         <li> 
                 {% elif request.user.is_admin %}
 
-                <a href="{% url 'school:staff_leave_view' %}"><i class="fas fa-book"></i> <span>Leave</span></a>
+            <a href="{% url 'school:staff_leave_view' %}"><i class="fas fa-book"></i> <span>Leave</span></a>
+            {% else %}
 
-                {% else %}
-
-                {% endif %}
-               </li>
+            {% endif %}
+         </li>
+               
+              
           
              <li class="menu-title">
                 <span>Pages</span>

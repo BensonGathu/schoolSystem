@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.contrib import messages
 import json
-from .forms import staffApplyLeaveForm,staffUpdateProfileForm
+from .forms import staffApplyLeaveForm,staffUpdateProfileForm,addResultsForm
 
 from .models import User, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
 
@@ -376,26 +376,62 @@ def staff_profile_update(request):
 
 def staff_add_result(request):
 	subjects = Subjects.objects.filter(staff_id=request.user.id)
+	class_list = []
+	for subject in subjects:
+		class_list.append(subject.class_id.name)
+	final_class_list= set(class_list)
 	session_years = SessionYearModel.objects.all()
 	context = {
 		"subjects": subjects,
 		"session_years": session_years,
+		"final_class_list":final_class_list
 	}
-	return render(request, "staff_template/add_result_template.html", context)
+	return render(request, "Staff_templates/add_result.html", context)
+
+def staff_students(request,subject_id):
+	current_subject = get_object_or_404(Subjects,id=subject_id)
+	students = []
+
+	all_students =  Students.objects.all()
+	for student in all_students:
+		for subject in student.subject_id.all():
+			if subject.id == int(subject_id):
+				students.append(student)
+	
+	context = {
+		"students": students,
+		"current_subject":current_subject
+	} 
+	return render(request, 'Staff_templates/students.html', context)
+
+def staff_students_all(request):
+	students = []
+
+	all_students =  Students.objects.all()
+	for student in all_students:
+		for subject in student.subject_id.all():
+			if subject.staff_id == request.user:
+				students.append(student)
+	
+	context = {
+		"students": students,
+	} 
+	return render(request, 'Staff_templates/all_students.html', context)
 
 
-def staff_add_result_save(request):
-	if request.method != "POST":
-		messages.error(request, "Invalid Method")
-		return redirect('staff_add_result')
-	else:
-		student_users_type_id = request.POST.get('student_list')
-		assignment_marks = request.POST.get('assignment_marks')
-		exam_marks = request.POST.get('exam_marks')
-		subject_id = request.POST.get('subject')
-
-		student_obj = Students.objects.get(users_type=student_users_type_id)
-		subject_obj = Subjects.objects.get(id=subject_id)
+def staff_add_marks(request,studentID,subjectID):
+	student_obj = get_object_or_404(Students,id=studentID)
+	subject_obj =get_object_or_404(Subjects,id=subjectID)
+	form = addResultsForm()
+	if request.method == "POST":
+		form = addResultsForm(request.POST)
+		if form.is_valid():
+			marks = form.save(commit=False)
+			marks.student = student_obj
+			marks.subjects = subject_obj
+			
+			marks.teacher = request.user.username
+			marks.save()
 
 		try:
 			# Check if Students Result Already Exists or not
@@ -420,3 +456,4 @@ def staff_add_result_save(request):
 		except:
 			messages.error(request, "Failed to Add Result!")
 			return redirect('staff_add_result')
+

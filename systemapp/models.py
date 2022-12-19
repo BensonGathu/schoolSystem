@@ -184,7 +184,7 @@ class Classes(models.Model):
 class Subjects(models.Model):
     id =models.AutoField(primary_key=True)
     subject_name = models.CharField(choices=subject_names,max_length=255)
-     
+      
     # need to give default course
     class_id = models.ForeignKey(Classes,on_delete=models.DO_NOTHING,null=True)
     # session_id = models.ForeignKey(SessionYearModel, on_delete=models.DO_NOTHING, null = True)
@@ -237,12 +237,75 @@ class StudentResult(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
-
+    
 
     class Meta:
         unique_together=("student_id", "subject_id")
 
+    def __str__(self):
+        if self.subject_exam1_marks != None and self.subject_exam2_marks != None and self.subject_endexam_marks != None:
+            return "{} {} = {}".format(self.student_id,self.subject_id,(self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks)
 
+
+    @property
+    def mean_marks(self):
+        return (self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks
+
+    @property
+    def grade(self):
+        gde = self.mean_marks
+        if 80 <= gde <= 100:
+            return "A"
+        elif gde >= 75:
+            return "A-"
+        elif gde >= 70:
+            return "B+"
+        elif gde >= 65:
+            return "B"
+        elif gde >= 60:
+            return "B-"
+        elif gde >= 55:
+            return "C+"
+        elif gde >= 50:
+            return "C"
+        elif gde >= 45:
+            return "C-"
+        elif gde >= 40:
+            return "D+"
+        elif gde >= 35:
+            return "D"
+        elif gde >= 30:
+            return "D-"
+        elif  gde >= 0:
+            return "E"
+
+    @property
+    def points(self):
+        grade = self.grade
+        if grade == "A":
+            return 12
+        elif grade == "A-":
+            return 11
+        elif grade == "B+":
+            return 10
+        elif grade == "B":
+            return 9
+        elif grade == "B-":
+            return 8
+        elif grade == "C+":
+            return 7
+        elif grade == "C":
+            return 6
+        elif grade == "C-":
+            return 5
+        elif grade == "D+":
+            return 4
+        elif grade == "D":
+            return 3
+        elif grade == "D-":
+            return 2
+        elif grade == "E":
+            return 1
 
 
 class FeedBackStudent(models.Model):

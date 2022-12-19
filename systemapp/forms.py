@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,leave_types
+from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students,  FeedBackStudent, NotificationStudent, Timetable, Exams,leave_types
 from django.contrib.auth.forms import UserCreationForm
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from bootstrap_datepicker_plus.widgets import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
@@ -187,44 +187,6 @@ class addStaffForm(forms.Form):
                                   required=False,
                                   widget=forms.FileInput(attrs={"class": "form-control"}))
 
-
-class addStaffForm(forms.Form):
-    first_name = forms.CharField(label="First Name",
-                                 max_length=50,
-                                 widget=forms.TextInput(attrs={"class": "form-control"}))
-
-    last_name = forms.CharField(label="Last Name",
-                                max_length=50,
-                                widget=forms.TextInput(attrs={"class": "form-control"}))
-                        
-
-    joining_date = forms.DateField(
-               widget=forms.TextInput(
-               attrs={'type':'date','class': 'form-control'}))
- 
-
-    email = forms.EmailField(label="Email",
-                             max_length=50,
-                             widget=forms.EmailInput(attrs={"class": "form-control"}))
-
-    phone = forms.IntegerField(label="phonenumber",
-                             
-                              widget=forms.NumberInput(attrs={"class": "form-control"}))
-
-
-
-
-    address = forms.CharField(label="Address",
-                              max_length=50,
-                              widget=forms.Textarea(attrs={"class": "form-control",'rows':3,'cols':45}))
-
-    national_ID = forms.IntegerField(label="national_ID",
-                              
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
-
-    staff_ID = forms.CharField(label="staff_ID",
-                              max_length=50,
-                              widget=forms.TextInput(attrs={"class": "form-control"}))
 
     
 
@@ -439,7 +401,7 @@ class AddStudentForm(forms.Form):
                                   widget=forms.FileInput(attrs={"class": "form-control"}))
 
 
-class EditStudentForm(forms.Form):
+class EditStudentForm(forms.Form): 
 
     first_name = forms.CharField(label="First Name",
                                  max_length=50,
@@ -965,3 +927,18 @@ class studentUpdateProfileForm(forms.Form):
 
 
 
+#add marks/results form
+class addResultsForm(forms.ModelForm):
+    subject_exam1_marks = forms.IntegerField(label="Cat one",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+    subject_exam2_marks = forms.IntegerField(label="Cat two",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+    subject_endexam_marks= forms.IntegerField(label="End term",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+
+    class Meta:
+        model = StudentResult
+        fields = ['subject_exam1_marks','subject_exam2_marks','subject_endexam_marks']

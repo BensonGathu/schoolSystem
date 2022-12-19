@@ -256,7 +256,9 @@ def add_staff(request):
 													email=email,
 													first_name=first_name,
 													last_name=last_name,
-													password=email,is_staff = True,is_teacher = True,
+													password=email,
+													is_staff = True,
+													is_teacher = True,
 													)
 
 
@@ -571,7 +573,7 @@ def student_view(request,student_id):
 		"student":student
 	}
 	return render(request, 'Admin_templates/student_details.html', context)
-
+ 
 def studentReg(request):
     form = CreateUserForm()
     if request.method == "POST":
@@ -637,11 +639,12 @@ def get_user_type_from_email(email_id):
     except:
         return None
 
+
+
 def add_student(request):
 	if request.method == "POST":
 		form = AddStudentForm(request.POST, request.FILES)
 		if form.is_valid():
-			profile_pic= form.cleaned_data['profile_pic']
 			first_name = form.cleaned_data['first_name']
 			last_name = form.cleaned_data['last_name']
 			email = form.cleaned_data['email']
@@ -655,51 +658,68 @@ def add_student(request):
 			gender = form.cleaned_data['gender']
 			fathers_name = form.cleaned_data['fathers_name']
 			fathers_email = form.cleaned_data['fathers_email']
-			fathers_phonenumber =form.cleaned_data['firstfathers_phonenumber_name']
+			fathers_phonenumber =form.cleaned_data['fathers_phonenumber']
 			mothers_name = form.cleaned_data['mothers_name']
 			mothers_email = form.cleaned_data['mothers_email']
 			mothers_phonenumber = form.cleaned_data['mothers_phonenumber']
 			residential_address =form.cleaned_data['residential_address']
 			admission_date = form.cleaned_data['admission_date']
+			
+			
+			if len(request.FILES) != 0:
+				profile_pic = form.cleaned_data['profile_pic']
+				fs = FileSystemStorage()
+				filename = fs.save(profile_pic.name, profile_pic)
+				profile_pic_url = fs.url(filename)
+			else:
+				profile_pic_url = None
 
-		
-
-
+			
 			try:
 				user = User.objects.create_user(username=email,
-													password=email,
 													email=email,
 													first_name=first_name,
 													last_name=last_name,
+													password=email,
 													is_student=True
-
 													)
-				student = Students.objects.create(users_type=user,gender=gender,profile_pic=profile_pic,address=address,student_id=student_ID,student_class=class_id,subject_id=subject_obj,session_year_id=session_year_id,kcpe_marks=kcpe_marks,admitted_at=admission_date,fathers_name=fathers_name,fathers_number=fathers_phonenumber,fathers_email=fathers_email,mothers_name=mothers_name,student_house=student_house,mothers_number=mothers_phonenumber,mothers_email=mothers_email,residential_address=residential_address)
-
-				user.students.kcpe_marks =kcpe_marks
-				subject_obj = Subjects.objects.get(id=subject_id)
-				user.students.subject_id =subject_obj
-
 
 
 				user.save()
-				messages.success(request, "Student Added Successfully!")
-				return HttpResponseRedirect('add_student')
-			except:
+
+				subject_obj = Subjects.objects.get(id=subject_id)
+				class_obj = Classes.objects.get(id=class_id)
+				session_obj = SessionYearModel.objects.get(id=session_year_id)
+
+				student = Students.objects.create(users_type=user,
+				gender=gender,profile_pic=profile_pic_url,address=address,
+				student_id=student_ID,student_class=class_obj,
+				subject_id=subject_obj,session_year_id=session_obj,
+				kcpe_marks=kcpe_marks,admitted_at=admission_date,
+				fathers_name=fathers_name,fathers_number=fathers_phonenumber,
+				fathers_email=fathers_email,mothers_name=mothers_name,
+				student_house=student_house,mothers_number=mothers_phonenumber,
+				mothers_email=mothers_email,residential_address=residential_address)				
 				
-				messages.error(request, "Failed to Add Staff!")
-				return redirect('school:add_staff')
+				
+				student.save()
+				print(user)
+				messages.success(request, "student Added Successfully!")
+				return redirect('school:add_student')
+			except:
+				 
+				messages.error(request, "Failed to Add student!")
+				return redirect('school:add_student')
+		else:
+			return redirect('school:add_student')
 
 	else:
-
-			
-		form = AddStudentForm()	
-			
+		form = AddStudentForm()
 		context = {
-			'form': form
+		"form": form
 		}
-		print("invalid")
-		return render(request, 'Admin_templates/add_student.html', context)
+		return render(request, "Admin_templates/add_student.html", context)
+
 
 
 def manage_student(request):
