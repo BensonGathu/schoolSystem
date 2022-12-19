@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,leave_types
+from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students,  FeedBackStudent, NotificationStudent, Timetable, Exams,leave_types
 from django.contrib.auth.forms import UserCreationForm
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from bootstrap_datepicker_plus.widgets import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
@@ -401,7 +401,7 @@ class AddStudentForm(forms.Form):
                                   widget=forms.FileInput(attrs={"class": "form-control"}))
 
 
-class EditStudentForm(forms.Form):
+class EditStudentForm(forms.Form): 
 
     first_name = forms.CharField(label="First Name",
                                  max_length=50,
@@ -927,3 +927,18 @@ class studentUpdateProfileForm(forms.Form):
 
 
 
+#add marks/results form
+class addResultsForm(forms.ModelForm):
+    subject_exam1_marks = forms.IntegerField(label="Cat one",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+    subject_exam2_marks = forms.IntegerField(label="Cat two",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+    subject_endexam_marks= forms.IntegerField(label="End term",
+                             
+                              widget=forms.NumberInput(attrs={"class": "form-control"}))
+
+    class Meta:
+        model = StudentResult
+        fields = ['subject_exam1_marks','subject_exam2_marks','subject_endexam_marks']

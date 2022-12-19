@@ -20,6 +20,8 @@ urlpatterns = [
     path('doLogin', views.loginpage, name="doLogin"),
     path('doRegistration', views.doRegistration, name="doRegistration"),
     path('newtrRegistration', AdminViews.teacher_registration, name="newtrRegistration"),
+    path('inbox', views.inbox, name="inbox"),
+
      
     # URLS for Student
     path('student_home/', StudentViews.student_home, name="student_home"),
@@ -49,7 +51,9 @@ urlpatterns = [
     path('staff_profile/', StaffViews.staff_profile, name="staff_profile"),
     path('staff_profile_update/', StaffViews.staff_profile_update, name="staff_profile_update"),
     path('staff_add_result/', StaffViews.staff_add_result, name="staff_add_result"),
-    path('staff_add_result_save/', StaffViews.staff_add_result_save, name="staff_add_result_save"),
+    path('staff_students/<subject_id>', StaffViews.staff_students, name="staff_students"),
+    path('staff_students_all/', StaffViews.staff_students_all, name="staff_students_all"),
+  
      
     # URL for Admin
     path('admin_home/', AdminViews.admin_home, name="admin_home"),

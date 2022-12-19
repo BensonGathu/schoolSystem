@@ -1,6 +1,6 @@
 from atexit import register
 from django import template
-from systemapp.models import Students,Classes,Subjects
+from systemapp.models import Students,Classes,Subjects,StudentResult
 register = template.Library()
 
 
@@ -53,3 +53,12 @@ def student_count(staffID):
     except:
         return 0
       
+
+
+@register.simple_tag
+def get_student_marks(studentID,subjectID):
+    try:
+        results = StudentResult.objects.get(student_id=studentID,subject_id=subjectID)
+        return results
+    except:
+        return None

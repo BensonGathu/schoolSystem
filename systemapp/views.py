@@ -9,13 +9,19 @@ from django.contrib import messages
 from channels.layers import get_channel_layer
 
 from asgiref.sync import async_to_sync
+
+
+
 def test(request):
     channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send(
+    async_to_sync(channel_layer.group_send)(
         "notification_broadcast",
-        {'type':"send_notification",
-        'message':"test notification"}
-    ))
+
+        {
+            'type':"send_notification",
+            'message':"test notification"
+        }
+    )
 
     return HttpResponse("Done")
 
@@ -158,3 +164,10 @@ def get_user_type_from_email(email_id):
         return CustomUser.EMAIL_TO_USER_TYPE_MAP[email_user_type]
     except:
         return None
+
+
+def inbox(request):
+    context = {
+
+    }
+    return render(request, 'inbox.html', context)

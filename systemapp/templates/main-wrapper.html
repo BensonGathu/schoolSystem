@@ -61,7 +61,7 @@
              <div class="dropdown-menu">
                 <div class="user-header">
                    <div class="avatar avatar-sm">
-                      <img src="{% static '/img/profiles/avatar-01.jpg' %}" alt="User Image" class="avatar-img rounded-circle">
+                      <img src="{{request.profile_pic.url}}" alt="User Image" class="avatar-img rounded-circle">
                    </div>
                    <div class="user-text">
                       <h6>{{request.user.first_name}} {{request.user.last_name}}</h6>
@@ -69,30 +69,36 @@
                    </div>
                 </div>
                 <a class="dropdown-item" href="profile.html">My Profile</a>
-                <a class="dropdown-item" href="inbox.html">Inbox</a>
+                <a class="dropdown-item" href="{% url 'school:inbox'%}">Inbox</a>
                 <a class="dropdown-item" href="{% url 'school:logout_user'%}">Logout</a>
              </div>
           </li>
        </ul>
     </div>
-
-    <!-- <script>
+    {{ room_name|json_script:"room-name" }}
+    <script>
       const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-      const chatSocket = new WebSocket(
+      const notificationSocket = new WebSocket(
           'ws://'
           + window.location.host
           + '/ws/notification/'
           + roomName
           + '/'
-      );
-
-      chatSocket.onmessage = function(e) {
-          const data = JSON.parse(e.data);
-          //document.querySelector('#chat-log').value += (data.message + '\n');
+      );  
+      notificationSocket.onopen = function(e) {
+          console.info('Chat socket openned successfully');
       };
 
-      chatSocket.onclose = function(e) {
+      notificationSocket.onmessage = function(e) {
+          const data = JSON.parse(e.data);
+          console.log(data);
+          document.getElementById("notifications-dropdown").innerHTML = "<li class='dropdown-item'>" + data + "</li><hr class='dropdown-divider'>" + document.getElementById("notifications-dropdown").innerHTML;
+        document.getElementById("notification-badge").innerHTML = parseInt(document.getElementById("notification-badge").innerHTML) + 1;
+         //  document.querySelector('#chat-log').value += (data.message + '\n');
+      };
+
+      notificationSocket.onclose = function(e) {
           console.error('Chat socket closed unexpectedly');
       };
 
@@ -111,4 +117,4 @@
       //     }));
       //     messageInputDom.value = '';
       // };
-  </script> -->
+  </script>

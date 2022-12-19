@@ -59,45 +59,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
  <!-- Moment.js -->
 
- <script>
-   const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
-   const notificationSocket = new WebSocket(
-       'ws://'
-       + window.location.host
-       + '/ws/notification/'
-       + roomName
-       + '/'
-   );
-
-   notificationSocket.onmessage = function(e) {
-       const data = JSON.parse(e.data);
-       //document.querySelector('#chat-log').value += (data.message + '\n');
-
-       console.log(data);
-       document.getElementById("notifications-dropdown").innerHTML = "<li class='dropdown-item'>" + data + "</li><hr class='dropdown-divider'>" + document.getElementById("notifications-dropdown").innerHTML;
-        document.getElementById("notification-badge").innerHTML = parseInt(document.getElementById("notification-badge").innerHTML) + 1;
-   };
-
-   notificationSocket.onclose = function(e) {
-       console.error('Chat socket closed unexpectedly');
-   };
-
-//    document.querySelector('#chat-message-input').focus();
-//    document.querySelector('#chat-message-input').onkeyup = function(e) {
-//        if (e.keyCode === 13) {  // enter, return
-//            document.querySelector('#chat-message-submit').click();
-//        }
-//    };
-
-//    document.querySelector('#chat-message-submit').onclick = function(e) {
-//        const messageInputDom = document.querySelector('#chat-message-input');
-//        const message = messageInputDom.value;
-//        chatSocket.send(JSON.stringify({
-//            'message': message
-//        }));
-//        messageInputDom.value = '';
-//    };
-</script>
  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
 </html>
