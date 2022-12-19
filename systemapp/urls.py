@@ -51,10 +51,13 @@ urlpatterns = [
     path('staff_profile/', StaffViews.staff_profile, name="staff_profile"),
     path('staff_profile_update/', StaffViews.staff_profile_update, name="staff_profile_update"),
     path('staff_add_result/', StaffViews.staff_add_result, name="staff_add_result"),
+    path('staff_add_marks/<student_id>/', StaffViews.staff_add_marks, name="staff_add_marks"),
+    path('staff_edi_marks/<student_id>/', StaffViews.staff_edit_marks, name="staff_edit_marks"),
+
     path('staff_students/<subject_id>', StaffViews.staff_students, name="staff_students"),
     path('staff_students_all/', StaffViews.staff_students_all, name="staff_students_all"),
   
-     
+
     # URL for Admin
     path('admin_home/', AdminViews.admin_home, name="admin_home"),
     path('add_staff/', AdminViews.add_staff, name="add_staff"),

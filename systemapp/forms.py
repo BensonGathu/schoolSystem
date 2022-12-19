@@ -4,7 +4,14 @@ from .models import  User, SessionYearModel, StudentResult, Admin, Staffs, FeedB
 from django.contrib.auth.forms import UserCreationForm
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from bootstrap_datepicker_plus.widgets import DatePickerInput, TimePickerInput, DateTimePickerInput, MonthPickerInput, YearPickerInput
-from django.db import transaction
+from django.db import transaction 
+from bootstrap_modal_forms.forms import BSModalModelForm
+
+class BookModelForm(BSModalModelForm):
+    class Meta:
+        model = StudentResult
+        fields = ['subject_exam1_marks','subject_exam2_marks','subject_endexam_marks']
+
 
 class TeacherSignUpForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={"class":'form-control my-2', 'placeholder':'Enter firstname','type':'text'}))
@@ -929,13 +936,13 @@ class studentUpdateProfileForm(forms.Form):
 
 #add marks/results form
 class addResultsForm(forms.ModelForm):
-    subject_exam1_marks = forms.IntegerField(label="Cat one",
+    subject_exam1_marks = forms.IntegerField(label="Cat one",required=False,
                              
                               widget=forms.NumberInput(attrs={"class": "form-control"}))
-    subject_exam2_marks = forms.IntegerField(label="Cat two",
+    subject_exam2_marks = forms.IntegerField(label="Cat two",required=False,
                              
                               widget=forms.NumberInput(attrs={"class": "form-control"}))
-    subject_endexam_marks= forms.IntegerField(label="End term",
+    subject_endexam_marks= forms.IntegerField(label="End term",required=False,
                              
                               widget=forms.NumberInput(attrs={"class": "form-control"}))
 
