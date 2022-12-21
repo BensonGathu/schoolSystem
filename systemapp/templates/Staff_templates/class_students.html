@@ -1,0 +1,78 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block content %}
+
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+         <div class="page-wrapper">
+            <div class="content container-fluid">
+               <div class="page-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                      <h5 class="page-title"> <small> <b> {{current_class.name}} Students</b></small></h5>
+                      <ul class="breadcrumb">
+                        <li class="breadcrumb-item">
+                          <a href="{% url 'school:staff_home' %}">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active">my students</li>
+                      </ul>
+                    </div>
+                  </div>
+           
+               </div>
+               <div class="row">
+                  <div class="col-sm-12">
+                     <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                              <table class="table table-hover table-center mb-0 ">
+                                 <thead>
+                                    <tr>
+                                       <th>Student ID</th>
+                                       <th>Name</th>
+                                       <th>Subjects</th>
+                                       <th>KCPE</th>
+                                       <th>Report</th>
+                                     
+                                   
+                                      
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    {% for student in class_students %}
+                                    <tr>
+                                       <td> <span> {{student.student_id}}</span></td>
+                                       <td><span>
+                                        <h2 class="table-avatar">
+                                           <a href="{% url 'school:student_details' student.id %}" class="avatar avatar-sm mr-2"><img class="avatar-img rounded-circle" src="{{student.profile_pic.url}}" alt="User Image"></a>
+                                           <a href="{% url 'school:student_details' student.id %}">{{student.users_type.first_name}} {{student.users_type.last_name}}</a>
+                                        </h2></span>
+                                     </td>
+                                    <td><span>{{student.subject_id.count}}</span></td>
+                                    <td><span>{{student.kcpe_marks}}</span></td> 
+                                    <td><span>   <a href="#" class=" ">
+                                        <!-- <i class="fas fa-plus"></i> -->
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+
+                                        </a></span></td>
+                                  
+                                    
+                              
+                                    </tr>
+                                    {% endfor %}
+                                 </tbody>
+                               
+                              </table>
+                             </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      
+   </body>
+   {% endblock %}
+   
+</html>

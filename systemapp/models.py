@@ -228,12 +228,14 @@ class Students(models.Model):
 
 class StudentResult(models.Model):
     id = models.AutoField(primary_key=True)
+    classes_id = models.ForeignKey(Classes,on_delete=models.CASCADE)
     student_id = models.ForeignKey(Students, on_delete=models.DO_NOTHING,null=True)
     subject_id = models.ForeignKey(Subjects, on_delete=models.DO_NOTHING, null=True)
     staff_id = models.ForeignKey(Staffs, on_delete=models.DO_NOTHING, null=True)
     subject_exam1_marks = models.FloatField(validators=[MaxValueValidator(30),MinValueValidator(0)],default=0,null=True,blank=True)
     subject_exam2_marks = models.FloatField(validators=[MaxValueValidator(30),MinValueValidator(0)],default=0,null=True,blank=True)
     subject_endexam_marks = models.FloatField(validators=[MaxValueValidator(70),MinValueValidator(0)],default=0,null=True,blank=True)
+
  
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -246,39 +248,47 @@ class StudentResult(models.Model):
     def __str__(self):
         if self.subject_exam1_marks != None and self.subject_exam2_marks != None and self.subject_endexam_marks != None:
             return "{} {} = {}".format(self.student_id,self.subject_id,(self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks)
-
+     
 
     @property
     def mean_marks(self):
-        return (self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks
+        if self.subject_exam1_marks != None and self.subject_exam2_marks != None and self.subject_endexam_marks != None:
+            return (self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks
+        
+        # elif self.subject_exam1_marks != None and self.subject_exam2_marks == None and self.subject_endexam_marks == None:
+        # return "-"
 
     @property
     def grade(self):
-        gde = self.mean_marks
-        if 80 <= gde <= 100:
-            return "A"
-        elif gde >= 75:
-            return "A-"
-        elif gde >= 70:
-            return "B+"
-        elif gde >= 65:
-            return "B"
-        elif gde >= 60:
-            return "B-"
-        elif gde >= 55:
-            return "C+"
-        elif gde >= 50:
-            return "C"
-        elif gde >= 45:
-            return "C-"
-        elif gde >= 40:
-            return "D+"
-        elif gde >= 35:
-            return "D"
-        elif gde >= 30:
-            return "D-"
-        elif  gde >= 0:
-            return "E"
+        if self.subject_exam1_marks != None and self.subject_exam2_marks != None and self.subject_endexam_marks != None:
+
+            gde =(self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks
+        
+            if 80 <= gde <= 100:
+                return "A"
+            elif gde >= 75:
+                return "A-"
+            elif gde >= 70:
+                return "B+"
+            elif gde >= 65:
+                return "B"
+            elif gde >= 60:
+                return "B-"
+            elif gde >= 55:
+                return "C+"
+            elif gde >= 50:
+                return "C"
+            elif gde >= 45:
+                return "C-"
+            elif gde >= 40:
+                return "D+"
+            elif gde >= 35:
+                return "D"
+            elif gde >= 30:
+                return "D-"
+            elif  gde >= 0:
+                return "E"
+        return "--"
 
     @property
     def points(self):
@@ -307,6 +317,96 @@ class StudentResult(models.Model):
             return 2
         elif grade == "E":
             return 1
+
+class studentReport(models.Model):
+    classes_id = models.ForeignKey(Classes,on_delete=models.CASCADE,related_name="class_report")
+    student_id = models.ForeignKey(Students,on_delete=models.CASCADE,related_name="student_report")
+    all_subjects = models.ManyToManyField(StudentResult)
+    date_created = models.DateTimeField(auto_now_add=True)
+    p_comments = models.CharField(max_length=100,null=True,blank=True)
+    t_comments = models.CharField(max_length=100,null=True,blank=True)
+    total_marks = models.FloatField(blank=True,null=True)
+    position = models.IntegerField(blank=True,null=True)
+    s_mean_marks = models.IntegerField(blank=True,null=True)
+    all_points = models.FloatField(blank=True,null=True)
+
+    class Meta:
+        unique_together=("classes_id", "student_id")
+
+    @property
+    def get_student_kcpe(self):
+        return (self.student.kcpe_marks)/500 * 100
+
+    @property
+    def get_Deviation(self):
+        if self.get_student_kcpe > self.s_mean_marks:
+            return "-{}%".format(abs(self.get_student_kcpe-self.s_mean_marks))
+        else:
+            return "+{}%".format(abs(self.get_student_kcpe-self.s_mean_marks))
+
+
+    @property
+    def overall_grade(self):
+        if self.all_points == 12 :
+            return "A"
+        elif self.all_points >= 11:
+            return "A-"
+        elif self.all_points >= 10:
+            return "B+"
+        elif self.all_points >= 9:
+            return "B"
+        elif self.all_points >= 8:
+            return "B-"
+        elif self.all_points >= 7:
+            return "C+"
+        elif self.all_points >= 6:
+            return "C"
+        elif self.all_points >= 5:
+            return "C-"
+        elif self.all_points >= 4:
+            return "D+"
+        elif self.all_points >= 3:
+            return "D"
+        elif self.all_points >= 2:
+            return "D-"
+        elif self.all_points >= 0:
+            return "E"
+
+    # def mean(self):
+    #     # marks = 0
+    #     # for mark in self.all_subjects:
+    #     #     marks += mark
+    #     # return marks/self.get_number_of_elements()
+    #     # return self.objects.all().aggregate(Avg('all_subjects'))
+    #     #return self.all_subjects.add()
+    #     pass
+
+
+
+
+    def __str__(self):
+        return "{} - {}".format(self.student_id,self.classes_id)
+
+
+    @classmethod
+    def filter_by_class(cls,classes_ID):
+        report = cls.objects.filter(loc__classes_id=classes_ID).all()
+        return report
+
+class subjectInfo(models.Model):
+    student_id = models.ForeignKey(Students,on_delete=models.CASCADE)
+    subject_id = models.ForeignKey(Subjects,on_delete=models.CASCADE)
+    position = models.IntegerField(blank=True,null=True)
+    mean_marks = models.IntegerField(blank=True,null=True)
+
+    def __str__(self):
+        return "{} {} {}".format(self.student_id,self.subject_id,self.position)
+
+    def savesubjectinfo(self):
+        self.save()
+
+    class Meta:
+        unique_together=("student_id","subject_id")
 
 
 class FeedBackStudent(models.Model):

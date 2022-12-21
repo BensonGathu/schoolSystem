@@ -40,6 +40,7 @@ urlpatterns = [
     path('staff_home/', StaffViews.staff_home, name="staff_home"),
     path('staff_take_attendance/', StaffViews.staff_take_attendance, name="staff_take_attendance"),
     path('get_students/', StaffViews.get_students, name="get_students"),
+    path('class_students/<class_id>/', StaffViews.staff_class_students, name="staff_class_students"),
     #path('save_attendance_data/', StaffViews.save_attendance_data, name="save_attendance_data"),
     #path('staff_update_attendance/', StaffViews.staff_update_attendance, name="staff_update_attendance"),
     #path('get_attendance_dates/', StaffViews.get_attendance_dates, name="get_attendance_dates"),
@@ -52,7 +53,7 @@ urlpatterns = [
     path('staff_profile_update/', StaffViews.staff_profile_update, name="staff_profile_update"),
     path('staff_add_result/', StaffViews.staff_add_result, name="staff_add_result"),
     path('staff_add_marks/<student_id>/', StaffViews.staff_add_marks, name="staff_add_marks"),
-    path('staff_edi_marks/<student_id>/', StaffViews.staff_edit_marks, name="staff_edit_marks"),
+    path('staff_edit_marks/<student_id>/', StaffViews.staff_edit_marks, name="staff_edit_marks"),
 
     path('staff_students/<subject_id>', StaffViews.staff_students, name="staff_students"),
     path('staff_students_all/', StaffViews.staff_students_all, name="staff_students_all"),

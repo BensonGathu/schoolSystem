@@ -1,5 +1,6 @@
 from atexit import register
 from django import template
+from django.shortcuts import get_object_or_404
 from systemapp.models import Students,Classes,Subjects,StudentResult
 register = template.Library()
 
@@ -62,3 +63,26 @@ def get_student_marks(studentID,subjectID):
         return results
     except:
         return None
+
+@register.simple_tag
+def get_students_per_subject(subjectID):
+    # current_subject = get_object_or_404(Subjects,id=subjectID)
+    students = []
+    all_students =  Students.objects.all()
+    for student in all_students:
+        for subject in student.subject_id.all():
+            if subject.id == int(subjectID):
+                students.append(student)
+    return len(students)
+
+@register.simple_tag
+def student_subject_positions(id):
+    all_info = subjectInfo.objects.filter(subject=id).order_by("-mean_marks")
+    
+    for i,info in enumerate(all_info):
+        info.position = i+1 
+        info.save()
+        
+    return redirect("students",id)
+    
+

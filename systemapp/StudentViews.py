@@ -223,7 +223,9 @@ def student_profile(request):
 def student_view_result(request):
 	student = Students.objects.get(users_type=request.user.id)
 	student_result = StudentResult.objects.filter(student_id=student.id)
+	print("student result",student)
 	context = {
+		"student":student,
 		"student_result": student_result,
 	}
-	return render(request, "student_template/student_view_result.html", context)
+	return render(request, "Student_templates/student_view_result.html", context)
