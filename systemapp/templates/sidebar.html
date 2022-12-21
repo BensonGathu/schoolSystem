@@ -14,7 +14,7 @@
                   <li><a class="submenu" href="{% url 'school:staff_home' %}">Teacher Dashboard</a></li>                 
                </ul>
              
-             
+              
                {% elif request.user.is_student %}
           
                <ul>
@@ -73,7 +73,7 @@
              {% if request.user.is_student %} 
 
              <li>
-               <a href="#"><i class="fas fa-holly-berry"></i> <span>Exam Results</span></a>
+               <a href="{% url 'school:student_view_result'%}"><i class="fas fa-holly-berry"></i> <span>Exam Results</span></a>
             </li>
             <li>
                <a href="#"><i class="fas fa-holly-berry"></i> <span>Reports</span></a>

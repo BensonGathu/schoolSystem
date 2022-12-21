@@ -1,4 +1,5 @@
 {% extends '../base.html' %}
+{% load student_template_tags %}
 {% load static %}
 
 {% block content %}
@@ -17,14 +18,18 @@
                   <div class="col-lg-5">
                 <ul class="breadcrumb ">
                  
-                      <li class="breadcrumb-item ">
-                      <a href="#">Dashboard</a>
+                      <li class="breadcrumb-item active">
+                      <a href="#">Student Dashboard</a>
                     </li>
-                    <li class="breadcrumb-item active">Student Dashboard</li>
+                    <li class="breadcrumb-item "> <b> <i>{{student_obj.student_class.name}} {{student_obj.student_class.sessionperiod.school_term}}</i> </b> </li>
+                    
                   </div>
-                    <div class="col-lg-7"> 
+                    <!-- <div class="col-lg-7"> 
                     
                      <li class="breadcrumb-item active"><b> Current class: </b> {{student_obj.student_class}}</li>
+                  </div> -->
+                  <div class="col-6">
+                    <h6 class="card-title " style="text-align: right;"><b> <i>{{student_obj.session_year_id.session_start_year}} to {{student_obj.session_year_id.session_end_year}} </i></b></h6>
                   </div>
                   </div>
                
@@ -95,8 +100,8 @@
                       <i class="fas fa-clipboard-check"></i>
                     </div>
                     <div class="db-info">
-                      <h3>15/20</h3>
-                      <h6>Test Passed</h6>
+                      <h3>{% get_results_added  student_obj.id %}/ {{total_subjects}}</h3>
+                      <h6>Results Added</h6>
                     </div>
                   </div>
                 </div>

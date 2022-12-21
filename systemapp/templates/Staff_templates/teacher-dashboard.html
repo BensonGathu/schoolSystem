@@ -35,8 +35,14 @@
                       <i class="fas fa-chalkboard"></i>
                     </div>
                     <div class="db-info">
-                      <h3>Class </h3>
-                      <h6>{% classes_count request.user.id %}</h6>
+                      <h6><b>ClassTeacher</b></h6>
+                      <!-- <h6>{% classes_count request.user.id %}</h6> -->
+                      {% for classes in classteacher_to %}
+                       <h6>{{classes.name}}</h6>
+                      
+                       <a href="{% url 'school:staff_class_students' classes.id %}"><span> <small>view</small></span></a> 
+                      
+                      {% endfor %}
                     </div>
                   </div>
                 </div>

@@ -1,0 +1,83 @@
+{%extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+
+
+
+         <div class="page-wrapper">
+          <div class="content container-fluid">
+
+         <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <div class="row">
+                    <div class="col-6">
+                  <h4 class="card-title"> <small><b> {{student.student_class.name}} {{student.student_class.sessionperiod.school_term}} Results</b></small></h4>
+                </div>
+
+                <div class="col-6">
+                  <h6 class="card-title" style="text-align: right;"><small><b> <i>{{student.session_year_id.session_start_year}} to {{student.session_year_id.session_end_year}}</i></b></small></h6>
+                </div>
+                </div> 
+                </div>
+                <div class="card-body">
+                  
+                  <div class="table-responsive">
+                    <table class=" table-hover table mb-0">
+                      <thead>
+                        <tr>
+                          <th>Subject</th>
+                          <th>Cat 1</th>
+                          <th>Cat 2</th>
+                          <th>Endterm</th>
+                          <th>Grade</th>
+                          <th>Position</th>
+                          <th>Comment</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for result in student_result %}
+                        <tr class="table-light">
+                          <td><span>{{result.subject_id.subject_name}}</span></td>
+                          <td><span>{{result.subject_exam1_marks}}</span></td>
+                          <td>
+                            <span>{{result.subject_exam2_marks}}</span>
+                          </td>
+                          <td>
+                            <span>{{result.subject_endexam_marks}}</span>
+                          </td>
+                          <td>
+                            <span>{{result.grade}}</span>
+                          </td>
+                          <td>
+                            <span></span>
+                          </td>
+                          <td>
+                            <span></span>
+                          </td>
+                        </tr>
+                      {%endfor%}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+         </div>
+        </div>
+         <footer>
+            <p>Copyright © 2020 Dreamguys.</p>
+          </footer>
+        </div>
+        
+      </div>
+     
+    </body>
+    {% endblock %}
+  
+  

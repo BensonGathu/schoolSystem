@@ -1,6 +1,7 @@
 {%extends 'base.html' %}
 {% load static %}
-
+{% load teacher_template_tags %}
+{% load student_template_tags %}
 {% block content %}
    <body>
       {% include "main-wrapper.html" %}
@@ -9,72 +10,85 @@
 
       <div class="page-wrapper">
         <div class="content container-fluid">
-          <!-- <div class="page-header">
+          <div class="page-header">
             <div class="row">
               <div class="col-sm-12">
-                <h3 class="page-title">Welcome Jonathan!</h3>
+                <!-- <h3 class="page-title">Welcome Jonathan!</h3> -->
                 <ul class="breadcrumb">
                   <li class="breadcrumb-item">
-                    <a href="index.html">Dashboard</a>
+                    <a href="{% url 'school:staff_home' %}">Dashboard</a>
                   </li>
-                  <li class="breadcrumb-item active">Teacher Dashboard</li>
+                  <li class="breadcrumb-item active">Subjects </li>
                 </ul>
               </div>
             </div>
-          </div> -->
+          </div>
 
 
           <div class="row">
             <div class="col-12 col-lg-12 col-xl-9">
               <div class="row">
-                <div class="col-12 col-lg-8 col-xl-8 d-flex">
+                <div class="col-12 col-lg-12 col-xl-8 d-flex">
                   <div class="card flex-fill">
                     <div class="card-header">
                       <div class="row align-items-center">
-                        <div class="col-6">
-                          <h5 class="card-title">All Subjects</h5>
+                        <div class="col-12">
+                          <h5 class="card-title">
+                            <div class="row">
+                            <div class="col-6" >
+                              All Subjects
+                            </div>
+                            <div class="col-6">
+                              <span class="float-right view-link"
+                              ><a href="{% url 'school:staff_students_all' %}"> View All Students</a></span
+                            >
+                            </div>
+                          </div>
+                          </h5>
+                          
                         </div>
-                        <div class="col-6">
-                          <span class="float-right view-link"
-                            ><a href="{% url 'school:staff_students_all' %}">View All Students</a></span
-                          >
-                        </div>
+                        <!-- <div class="col-8">
+                       
+                        </div> -->
                       </div>
                     </div>
-                    <div class="pt-3 pb-3">
+                    <div class=" ">
                       <div class="table-responsive lesson">
                         <table class="table table-center">
+                          {% for subject in subjects%}
                           <tbody>
-                            {% for subject in subjects%}
+                         
                             <tr>
                               <td>
-                                <div class="date">
-                                  <b>{{subject.subject_name}}</b>
-                                  <!-- <p>2.30pm - 3.30pm (60min)</p> -->
-                                </div>
+                               
+                                  <b> <small>{{subject.subject_name}}</small></b>
+                              
+                             
                               </td>
                               <td>
-                                <div class="date">
-                                  <b>{{subject.class_id.name}}</b>
-                                  <!-- <p>3.1 Ipsuum dolor</p> -->
-                                </div>
+                                
+                                 <b><small> {{subject.class_id.name}}</small></b>
+                                 
+                              
                               </td>
-                              <!-- <td><a href="#">Confirmed</a></td> -->
+                              
                               <td>
                                   
                                  
-                             
+                                <!-- {% get_students_per_subject subject.id %} -->
+                                <!-- {% get_position subject.id %} -->
                                 <a href="{% url 'school:staff_students' subject.id %}"> <button type="submit"  class="btn btn-info  badge  "> Students</button> </a>
                               </td>
                             </tr>
-                      {%endfor%}
+                             {%endfor%}
                           </tbody>
+                         
                         </table>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-12 col-lg-4 col-xl-4 d-flex">
+                <!-- <div class="col-12 col-lg-4 col-xl-4 d-flex">
                   <div class="card flex-fill">
                     <div class="card-header">
                       <div class="row align-items-center">
@@ -95,9 +109,9 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
               </div>
-              <div class="row">
+              <!-- <div class="row">
                 <div class="col-12 col-lg-6 col-xl-8 d-flex">
                   <div class="card flex-fill">
                     <div class="card-header">
@@ -174,9 +188,9 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
-            <div class="col-12 col-lg-12 col-xl-3 d-flex">
+            <!-- <div class="col-12 col-lg-12 col-xl-3 d-flex">
               <div class="card flex-fill">
                 <div class="card-header">
                   <div class="row align-items-center">
@@ -231,7 +245,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
 

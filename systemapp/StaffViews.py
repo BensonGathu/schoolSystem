@@ -15,11 +15,15 @@ from .models import User, SessionYearModel, StudentResult, Staffs, FeedBackStaff
 	
 def staff_home(request):
 	# Fetching All Students under Staff
-    try:
-        classteacher_to = Classes.objects.filter(class_teacher=request.user.id)
-    except:
-        return None
-    subjects = Subjects.objects.filter(staff_id=request.user.id)
+	try:
+		classteacher_to = Classes.objects.filter(class_teacher=request.user.id)
+	except:
+		return None
+		
+	subjects = Subjects.objects.filter(staff_id=request.user.id)
+	# class_students = Students.objects.filter(student_class=classteacher_to)
+
+	
 	# classes_id_list = []
 	# for subject in subjects:
 	# 	classes = Classes.objects.filter(sessionperiod_id=subject.class_id.sessionperiod)
@@ -45,11 +49,11 @@ def staff_home(request):
 	# print(request.user)
     #  
    
-    staff = Staffs.objects.all()
+	staff = Staffs.objects.all()
  
 
 
-    leave_count = LeaveReportStaff.objects.filter(staff_id=request.user.id,
+	leave_count = LeaveReportStaff.objects.filter(staff_id=request.user.id,
                                                   leave_status=1).count()
     
 	
@@ -74,12 +78,13 @@ def staff_home(request):
 	# 	student_list_attendance_present.append(attendance_present_count)
 	# 	student_list_attendance_absent.append(attendance_absent_count)
     
-    context={
+	context={
 		# "students_count": students_count,
 		# "attendance_count": attendance_count,
 		"room_name":"broadcast",
 		"leave_count": leave_count,
-		"classteacher_to":classteacher_to
+		"classteacher_to":classteacher_to,
+		# "class_students":class_students
 		# "subject_count": subject_count,
 		# "subject_list": final_classes,
 		# "attendance_list": attendance_list,
@@ -87,8 +92,17 @@ def staff_home(request):
 		# "attendance_present_list": student_list_attendance_present,
 		# "attendance_absent_list": student_list_attendance_absent
 	}
-    return render(request, "Staff_templates/teacher-dashboard.html", context)
+	return render(request, "Staff_templates/teacher-dashboard.html", context)
 
+def staff_class_students(request,class_id):
+	class_students = Students.objects.filter(student_class=class_id)
+	current_class = Classes.objects.get(id=class_id)
+	context = {
+		"class_students":class_students,
+		"current_class":current_class
+	}
+
+	return render(request, "Staff_templates/class_students.html", context)
 
 
 def staff_take_attendance(request):
@@ -389,6 +403,8 @@ def staff_add_result(request):
 	}
 	return render(request, "Staff_templates/add_result.html", context)
 
+	
+
 def staff_students(request,subject_id):
 	current_subject = get_object_or_404(Subjects,id=subject_id)
 	students = []
@@ -433,14 +449,18 @@ def staff_add_marks(request,student_id):
 		form  = addResultsForm(request.POST, request.FILES)
 		if request.method == "POST":
 			if form.is_valid():
-					marks = form.save(commit=False)
-					marks.student_id = student_obj
-					marks.subject_id = subject_obj
-					
-					marks.staff_id = staff_obj
-					marks.save()
-					return redirect('school:staff_students', subjectID) 
-			
+				marks = form.save(commit=False)
+				marks.student_id = student_obj
+				marks.subject_id = subject_obj
+				marks.classes_id = student_obj.student_class
+				marks.staff_id = staff_obj
+				marks.save()
+
+				markss = StudentResult.objects.filter(student_id=student_obj,classes_id=student_obj.student_class)
+				print("maaaaarrrrrks",markss)
+				return redirect('school:staff_students', subjectID)
+
+		
 		form = addResultsForm()
 		context = {
 					"form":form
