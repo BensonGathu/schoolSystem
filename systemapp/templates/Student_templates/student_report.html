@@ -39,14 +39,95 @@
                              <a class="dropdown-item" data-value="{{session.id}}" href="#">{{session.name}} {{session.sessionperiod.school_term}}</a>
                              
                              {% endfor %}
-                             <!-- <a class="dropdown-item" data-value="1" href="#">Red</a>
-                             <a class="dropdown-item" data-value="2" href="#">Orange</a>
-                             <a class="dropdown-item" data-value="3" href="#">Yellow</a>
-                             <a class="dropdown-item" data-value="4" href="#">Green</a> -->
+                             
                           
                          </div>
+
                      </div>
                      <input class="d-none" name="example_two" readonly="readonly" aria-hidden="true" type="text"/>
+
+
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="card-title mb-2" style="text-align: center;"> 
+                     
+                     <div class="row">
+                        <div class="col" style="text-align: left;">
+                          logo
+                        </div>
+                        <div class="col" style="text-align: left;">
+                          School name
+                        </div>
+                        <div class="col" style="text-align: right;">
+                          QR code
+                        </div>
+                      </div>
+                  <hr>
+                  <p class="card-text">
+                     <h5 style="text-align: center;"><b> Students Report</b></h5>
+                     <div class="row">
+                        <div class="col" >
+                        <small> <b> Student Name:</b></small>
+                        </div>
+                      
+                        <div class="col" >
+                       <small>  <b>  Reg. Number:</b></small>
+                        </div>
+
+                        <div class="col" >
+                       <small>   <b>  Class:</b></small> 
+                           </div>
+                      </div>
+                      <div class="row">
+                        
+                      
+                        <div class="col" >
+                      <small>  <b>  Marks:</b></small>
+                        </div>
+
+                        <div class="col" >
+                        <small>   <b>  Grade:</b></small>
+                           </div>
+
+                           <div class="col" >
+                           <small>   <b>  Deviation:</b></small>
+                              </div>
+                      </div>
+                  </p>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class=" table table-stripped">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Subject</th>
+                          <th>Marks</th>
+                          <th>Grade</th>
+                         
+                        </tr>
+                      </thead>
+                      {% for report in all_reports %}
+                      <tbody>
+                        <tr>
+                          <td><span>{{report}}</span></td>
+                          <td><span>{{report}}</span></td>
+                          <td><span>{{report}}</span></td>
+                          <td><span></span></td>
+                        
+                        </tr>
+             
+                 
+                     {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
                  </div>
                  {{all_reports}}
                </div>
