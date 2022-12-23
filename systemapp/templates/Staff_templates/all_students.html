@@ -1,5 +1,6 @@
 {% extends '../base.html' %}
 {% load static %}
+{% load teacher_template_tags %} 
 
 {% block content %}
 
@@ -9,15 +10,18 @@
          <div class="page-wrapper">
             <div class="content container-fluid">
                <div class="page-header">
-                  <div class="row align-items-center">
+                  <div class="row">
                      <div class="col">
-                        <h3 class="page-title"></h3>
-                        <ul class="breadcrumb">
-                           All Students
-                           <li class="breadcrumb-item active"></li>
-                        </ul>
+                       <h3 class="page-title"></h3>
+                       <ul class="breadcrumb">
+                         <li class="breadcrumb-item">
+                           <a href="{% url 'school:staff_add_result' %}">Subjects</a>
+                         </li>
+                         <li class="breadcrumb-item active">All Students</li>
+                       </ul>
                      </div>
-                  </div>
+                   </div>
+            
                </div>
                <div class="row">
                   <div class="col-sm-12">
@@ -32,7 +36,7 @@
                                        
                                        <th>Class</th>
                                        <th>Subject</th>
-                                       <th>End Term</th>
+                                       <th>Mean Marks</th>
                                        <th>Grade</th>
                                      
                                    
@@ -41,6 +45,9 @@
                                  </thead>
                                  <tbody>
                                     {% for student in students %}
+                                    {% get_student_subject student.id request.user.id as subject %} 
+                                    {% get_student_marks student.id subject as marks %} 
+
                                     <tr>
                                        <td> <span> {{student.student_id}}</span></td>
                                        <td><span>
@@ -49,23 +56,37 @@
                                              <a >{{student.users_type.first_name}} {{student.users_type.last_name}}</a>
                                           </h2></span>
                                        </td>
-                                    <td><span></span></td>
-                                    <td><span></span></td> 
-                                    <td><span></span></td>
-                                    <td><span></span></td>
+                                    <td><span>{{student.student_class.name}}</span></td>
+                                    <td><span>{{subject.subject_name}}</span></td> 
+                                    <td><span>
+                                       {{marks.mean_marks}}
+                                    </span></td>
+                                    <td><span>{{marks.grade}}</span></td>
                                     
-                                       <td class="text-right">
-                                          <div class="actions">
-                                             <a href="#" class="btn btn-sm bg-danger-light mr-2 badge badge-success">
-                                             <!-- <i class="fas fa-plus"></i> -->
-                                             edit
-                                             </a>
-                                             <a href="#" class="btn btn-sm bg-success-light badge badge-success">
-                                             <!-- <i class="fas fa-trash"></i> -->
+                                    <td class="text-right">
+                                          
+                                       <div class="actions">
+                                          {% if marks.subject_exam1_marks and  marks.subject_exam2_marks and marks.subject_endexam_marks %}
+                                          <a href="{% url 'school:staff_edit_marks' student.id %}" class="btn btn-sm bg-danger-light mr-2 badge badge-success">
+                                          edit
+                                          </a>
+                                          {% elif marks.subject_exam1_marks or  marks.subject_exam2_marks or marks.subject_endexam_marks%}
+                                          <a href="{% url 'school:staff_edit_marks' student.id %}" class="btn btn-sm bg-success-light mr-2 badge badge-success">
                                              add
                                              </a>
-                                          </div>
-                                       </td>
+                                          {% else %}
+                                          <a href="{% url 'school:staff_add_marks' student.id %}" class="btn btn-sm bg-success-light badge badge-success" >
+                                        
+
+
+
+                                          add
+                                          
+                                          </a>
+                                          {% endif %}
+                                       </div>
+
+                                    </td>
                                     </tr>
                                     {% endfor %}
                                  </tbody>

@@ -75,6 +75,19 @@ def get_students_per_subject(subjectID):
                 students.append(student)
     return len(students)
 
+
+@register.simple_tag
+def get_student_subject(studentID,staffID):
+    student_obj = get_object_or_404(Students,id=studentID)
+    subjects = []
+    for subject in student_obj.subject_id.all():
+        if subject.staff_id.id == int(staffID):
+            subjects.append(subject)
+            return subject
+        
+
+
+
 @register.simple_tag
 def student_subject_positions(id):
     all_info = subjectInfo.objects.filter(subject=id).order_by("-mean_marks")
