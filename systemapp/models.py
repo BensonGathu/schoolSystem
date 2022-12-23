@@ -174,7 +174,7 @@ class Classes(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
-    def __str__(self):
+    def __str__(self): 
         return '{} {}'.format(self.name, self.sessionperiod)
 
 
@@ -248,15 +248,21 @@ class StudentResult(models.Model):
     def __str__(self):
         if self.subject_exam1_marks != None and self.subject_exam2_marks != None and self.subject_endexam_marks != None:
             return "{} {} = {}".format(self.student_id,self.subject_id,(self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks)
-     
+        return "{} results".format(self.student_id)
 
     @property
     def mean_marks(self):
         if self.subject_exam1_marks != None and self.subject_exam2_marks != None and self.subject_endexam_marks != None:
             return (self.subject_exam1_marks + self.subject_exam2_marks)/2 + self.subject_endexam_marks
         
-        # elif self.subject_exam1_marks != None and self.subject_exam2_marks == None and self.subject_endexam_marks == None:
-        # return "-"
+
+        elif self.subject_exam1_marks != None and self.subject_exam2_marks == None and self.subject_endexam_marks == None:
+            return (self.subject_exam1_marks + 0)/2 + 0
+
+        elif self.subject_exam1_marks != None and self.subject_exam2_marks != None and self.subject_endexam_marks == None:
+            return (self.subject_exam1_marks + self.subject_exam2_marks)/2 + 0
+
+        return 0
 
     @property
     def grade(self):
@@ -319,6 +325,7 @@ class StudentResult(models.Model):
             return 1
 
 class studentReport(models.Model):
+    sessionperiod = models.ForeignKey(SessionYearModel,on_delete=models.DO_NOTHING,null = True,blank=True)
     classes_id = models.ForeignKey(Classes,on_delete=models.CASCADE,related_name="class_report")
     student_id = models.ForeignKey(Students,on_delete=models.CASCADE,related_name="student_report")
     all_subjects = models.ManyToManyField(StudentResult)
@@ -331,7 +338,7 @@ class studentReport(models.Model):
     all_points = models.FloatField(blank=True,null=True)
 
     class Meta:
-        unique_together=("classes_id", "student_id")
+        unique_together=("sessionperiod","classes_id", "student_id")
 
     @property
     def get_student_kcpe(self):

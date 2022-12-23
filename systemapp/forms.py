@@ -695,7 +695,7 @@ subject_names = (
     )
 class addSubjectForm(forms.ModelForm):
     subject_name =   forms.ChoiceField(label="Subjects",
-                                   choices=subject_names,widget=forms.Select(attrs={"class": "form-control"}))
+                                   choices=subject_names,widget=forms.Select(attrs={"class": "form-control"}),initial="d")
 
 
       # For Displaying Classess

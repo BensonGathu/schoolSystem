@@ -9,7 +9,7 @@ from django.contrib import messages
 import json
 from .forms import staffApplyLeaveForm,staffUpdateProfileForm,addResultsForm
 
-from .models import User, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff
+from .models import User, SessionYearModel, StudentResult, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams,LeaveReportStaff, studentReport
 
 
 	
@@ -455,6 +455,26 @@ def staff_add_marks(request,student_id):
 				marks.classes_id = student_obj.student_class
 				marks.staff_id = staff_obj
 				marks.save()
+				
+				student_results = StudentResult.objects.filter(student_id=student_obj,classes_id=student_obj.student_class)
+
+				try:
+					student_report = studentReport.objects.get(classes_id = student_obj.student_class ,student_id=student_obj,sessionperiod=student_obj.session_year_id)
+				except:
+					student_report = studentReport.objects.create(classes_id = student_obj.student_class ,student_id=student_obj,sessionperiod=student_obj.session_year_id)
+
+				for results in student_results:
+					student_report.all_subjects.add(results)
+
+
+				my_marks = []
+				for mark in student_results:
+					my_marks.append(mark.mean_marks)
+				all_marks = sum(my_marks)
+
+				student_report.total_marks  = all_marks
+				student_report.save()
+				
 
 				markss = StudentResult.objects.filter(student_id=student_obj,classes_id=student_obj.student_class)
 				print("maaaaarrrrrks",markss)
@@ -463,7 +483,8 @@ def staff_add_marks(request,student_id):
 		
 		form = addResultsForm()
 		context = {
-					"form":form
+					"form":form,
+					"subject_obj":subject_obj
 				}
 
 		return render(request, 'Staff_templates/marks.html', context)
@@ -483,13 +504,37 @@ def staff_edit_marks(request,student_id):
 		form = addResultsForm(request.POST, request.FILES, instance=result)
 		if request.method == "POST":
 			if form.is_valid():
-					marks = form.save(commit=False)
-					marks.student_id = student_obj
-					marks.subject_id = subject_obj
-					
-					marks.staff_id = staff_obj
-					marks.save()
-					return redirect('school:staff_students', subjectID) 
+				marks = form.save(commit=False)
+				marks.student_id = student_obj
+				marks.subject_id = subject_obj
+				
+				marks.staff_id = staff_obj
+				marks.save()
+
+				student_results = StudentResult.objects.filter(student_id=student_obj,classes_id=student_obj.student_class)
+
+				try:
+					student_report = studentReport.objects.get(classes_id = student_obj.student_class ,student_id=student_obj,sessionperiod=student_obj.session_year_id)
+				except:
+					student_report = studentReport.objects.create(classes_id = student_obj.student_class ,student_id=student_obj,sessionperiod=student_obj.session_year_id)
+
+				for results in student_results:
+					student_report.all_subjects.add(results)
+
+
+				my_marks = []
+				for mark in student_results:
+					my_marks.append(mark.mean_marks)
+				all_marks = sum(my_marks)
+
+				student_report.total_marks  = all_marks
+				student_report.save()
+
+			
+
+
+
+				return redirect('school:staff_students', subjectID) 
 			context = {
 					"form":form,
 					"subjectID":subjectID
@@ -498,7 +543,8 @@ def staff_edit_marks(request,student_id):
 			
 		form = addResultsForm(instance=result)
 		context = {
-					"form":form
+					"form":form,
+					"subjectID":subjectID
 				}
 
 		return render(request, 'Staff_templates/marks.html', context)

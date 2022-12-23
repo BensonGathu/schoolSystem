@@ -6,7 +6,7 @@ from django.urls import reverse
 import datetime
 from django.contrib import messages
 from .forms import studentUpdateProfileForm 
-from .models import User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams
+from .models import User, SessionYearModel, StudentResult, Admin, Staffs, FeedBackStaffs, NotificationStaffs, Classes, Subjects, Students, StudentResult, FeedBackStudent, NotificationStudent, Timetable, Exams, studentReport
 
 
 def student_home(request):
@@ -181,7 +181,7 @@ def student_profile(request):
 	form.fields["password"].initial = user.users_type.password
 	form.fields["email"].initial = user.users_type.email
 	form.fields["profile_pic"].initial = user.users_type.profile_pic
-
+ 
 	context={
 		"user": user,
 		"student": student,
@@ -229,3 +229,19 @@ def student_view_result(request):
 		"student_result": student_result,
 	}
 	return render(request, "Student_templates/student_view_result.html", context)
+
+
+def student_report(request):
+	student_obj = Students.objects.get(users_type=request.user.id)
+
+	print(request.user.id)
+	my_sessions = []
+	all_reports = studentReport.objects.filter(student_id=student_obj)
+	for report in all_reports:
+		my_sessions.append(report.classes_id)
+	print("my sesssssioooons",my_sessions)
+	context = {
+		"all_reports":all_reports,
+		"my_sessions":my_sessions
+	}
+	return render(request, "Student_templates/student_report.html", context)

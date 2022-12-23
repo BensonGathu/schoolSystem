@@ -1,0 +1,65 @@
+{% extends '../base.html' %}
+{% load static %}
+
+{% block content %}
+   <body>
+      {% include "main-wrapper.html" %}
+         {% include "sidebar.html" %}
+         <div class="page-wrapper">
+            <div class="content container-fluid">
+               <div class="page-header">
+                  <div class="row align-items-center">
+                     <div class="col">
+                        <h3 class="page-title">Report</h3>
+                        <ul class="breadcrumb">
+                           <li class="breadcrumb-item"><a href="{% url 'school:student_home' %}">Dashboard</a></li>
+                           <li class="breadcrumb-item active">Report</li>
+                        </ul>
+                     </div>
+                     <div class="col-auto text-right float-right ml-auto">
+                        <a href="#" class="btn btn-outline-primary mr-2"
+                          ><i class="fas fa-download"></i> Download</a
+                        >
+                        <!-- <a href="add-fees-collection.html" class="btn btn-primary"
+                          ><i class="fas fa-plus"></i
+                        ></a> -->
+                      </div>
+                      
+                  </div>
+                  <br>
+                  <div class="dropdown hierarchy-select" id="example">
+                     <button type="button" class="btn btn-primary dropdown-toggle" id="example-two-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select Period</button>
+                     <div class="dropdown-menu" aria-labelledby="example-two-button">
+                         <!-- <div class="hs-searchbox">
+                             <input type="text" class="form-control" autocomplete="off">
+                         </div> -->
+                         <div class="hs-menu-inner">
+                             <a class="dropdown-item" data-value="" data-default-selected="" href="#"></a>
+                             {% for session in my_sessions%}
+                             <a class="dropdown-item" data-value="{{session.id}}" href="#">{{session.name}} {{session.sessionperiod.school_term}}</a>
+                             
+                             {% endfor %}
+                             <!-- <a class="dropdown-item" data-value="1" href="#">Red</a>
+                             <a class="dropdown-item" data-value="2" href="#">Orange</a>
+                             <a class="dropdown-item" data-value="3" href="#">Yellow</a>
+                             <a class="dropdown-item" data-value="4" href="#">Green</a> -->
+                          
+                         </div>
+                     </div>
+                     <input class="d-none" name="example_two" readonly="readonly" aria-hidden="true" type="text"/>
+                 </div>
+                 {{all_reports}}
+               </div>
+              
+            </div>
+         </div>
+      </div>
+      <script>
+   $(document).ready(function(){
+    $('#example').hierarchySelect({
+    hierarchy: false,
+    width: 'auto'
+   });
+});
+      </script>
+      {% endblock %}
